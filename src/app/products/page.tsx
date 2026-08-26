@@ -10,13 +10,13 @@ export default function ProductsPage() {
         <p className="text-xl leading-8 text-gray-600">
           This page is under construction. Product listings will appear here soon.
         </p>
-        <div className="mt-10">
-          <a
+        <div className="mt-10 relative z-50">
+          <Link
             href="/"
             className="text-sm font-semibold leading-6 text-blue-600 hover:text-blue-500"
           >
             &larr; Back to Home
-          </a>
+          </Link>
         </div>
       </main>
     </div>
