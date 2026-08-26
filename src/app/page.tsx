@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8">
@@ -11,18 +13,18 @@ export default function Home() {
         </p>
 
         <div className="flex gap-4 justify-center mt-10">
-          <a
+          <Link
             href="#"
             className="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             Browse Products
-          </a>
-          <a
+          </Link>
+          <Link
             href="#"
             className="text-sm font-semibold leading-6 text-gray-900 border border-gray-300 rounded-md px-3.5 py-2.5 hover:bg-gray-100"
           >
             Start Selling <span aria-hidden="true">→</span>
-          </a>
+          </Link>
         </div>
       </main>
     </div>
