@@ -11,12 +11,12 @@ export default function ProductsPage() {
           This page is under construction. Product listings will appear here soon.
         </p>
         <div className="mt-10">
-          <Link
+          <a
             href="/"
             className="text-sm font-semibold leading-6 text-blue-600 hover:text-blue-500"
           >
             &larr; Back to Home
-          </Link>
+          </a>
         </div>
       </main>
     </div>

@@ -13,18 +13,18 @@ export default function Home() {
         </p>
 
         <div className="flex gap-4 justify-center mt-10">
-          <Link
+          <a
             href="/products"
             className="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
           >
             Browse Products
-          </Link>
-          <Link
+          </a>
+          <a
             href="/sell"
             className="text-sm font-semibold leading-6 text-gray-900 border border-gray-300 rounded-md px-3.5 py-2.5 hover:bg-gray-100"
           >
             Start Selling <span aria-hidden="true">→</span>
-          </Link>
+          </a>
         </div>
       </main>
     </div>
