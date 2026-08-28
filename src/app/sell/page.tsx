@@ -52,8 +52,8 @@ export default function SellPage() {
       data.append('countInStock', formData.countInStock);
       data.append('image', image);
 
-      // Use environment variable for backend URL if available
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      // Use environment variable or fallback to live production Render backend
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://uzananunua.onrender.com';
       const response = await fetch(`${API_URL}/api/products`, {
         method: 'POST',
         body: data,
