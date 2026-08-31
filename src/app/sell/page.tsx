@@ -52,8 +52,8 @@ export default function SellPage() {
       data.append('countInStock', formData.countInStock);
       data.append('image', image);
 
-      // Use environment variable or fallback to local backend
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+      // Use environment variable if set, otherwise use relative path to Next.js API route
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
       const response = await fetch(`${API_URL}/api/products`, {
         method: 'POST',
         body: data,
