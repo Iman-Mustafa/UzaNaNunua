@@ -14,10 +14,14 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
     folder: 'uzananunua',
-    allowedFormats: ['jpeg', 'png', 'jpg'],
+    allowed_formats: ['jpeg', 'png', 'jpg', 'webp', 'gif'],
   },
 });
 
-const upload = multer({ storage: storage });
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+});
 
 module.exports = { cloudinary, upload };
+

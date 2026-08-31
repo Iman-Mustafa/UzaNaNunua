@@ -52,16 +52,22 @@ export default function SellPage() {
       data.append('countInStock', formData.countInStock);
       data.append('image', image);
 
-      // Use environment variable or fallback to live production Render backend
-      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://uzananunua.onrender.com';
+      // Use environment variable or fallback to local backend
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
       const response = await fetch(`${API_URL}/api/products`, {
         method: 'POST',
         body: data,
       });
 
+      const contentType = response.headers.get('content-type');
+      let responseData: any = null;
+      if (contentType && contentType.includes('application/json')) {
+        responseData = await response.json();
+      }
+
       if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.message || 'Failed to create product');
+        const errorMsg = responseData?.message || `Server error (${response.status}): Please check backend server status.`;
+        throw new Error(errorMsg);
       }
 
       router.push('/products');

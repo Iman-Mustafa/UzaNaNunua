@@ -21,14 +21,26 @@ export default function ProductsPage() {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        // Use environment variable or fallback to live production Render backend
-        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://uzananunua.onrender.com';
+        // Use environment variable or fallback to local backend
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
         const response = await fetch(`${API_URL}/api/products`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
+        
+        const contentType = response.headers.get('content-type');
+        let data: any = null;
+        if (contentType && contentType.includes('application/json')) {
+          data = await response.json();
         }
-        const data = await response.json();
-        setProducts(data);
+
+        if (!response.ok) {
+          const errorMsg = data?.message || `Failed to fetch products (Status: ${response.status})`;
+          throw new Error(errorMsg);
+        }
+
+        if (Array.isArray(data)) {
+          setProducts(data);
+        } else {
+          setProducts([]);
+        }
       } catch (err: any) {
         setError(err.message || 'Something went wrong');
       } finally {
