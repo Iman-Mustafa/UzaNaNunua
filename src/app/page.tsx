@@ -19,12 +19,6 @@ export default function Home() {
           >
             Browse Products
           </Link>
-          <Link
-            href="/sell"
-            className="text-sm font-semibold leading-6 text-gray-900 border border-gray-300 rounded-md px-3.5 py-2.5 hover:bg-gray-100"
-          >
-            Start Selling <span aria-hidden="true">→</span>
-          </Link>
         </div>
       </main>
     </div>
