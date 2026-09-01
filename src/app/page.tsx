@@ -1,4 +1,3 @@
-import Link from 'next/link';
 
 export default function Home() {
   return (
@@ -12,14 +11,7 @@ export default function Home() {
           Your premier marketplace for buying and selling. We're currently getting things ready.
         </p>
 
-        <div className="flex gap-4 justify-center mt-10 relative z-50">
-          <Link
-            href="/products"
-            className="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-          >
-            Browse Products
-          </Link>
-        </div>
+
       </main>
     </div>
   );

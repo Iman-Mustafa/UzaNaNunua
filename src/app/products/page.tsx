@@ -63,14 +63,7 @@ export default function ProductsPage() {
               Browse the latest items listed by our community.
             </p>
           </div>
-          <div>
-            <Link
-              href="/sell"
-              className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-            >
-              Sell an Item
-            </Link>
-          </div>
+
         </div>
 
         <Link href="/" className="text-sm font-semibold text-blue-600 hover:text-blue-500 mb-6 inline-block">
@@ -87,13 +80,7 @@ export default function ProductsPage() {
           </div>
         ) : products.length === 0 ? (
           <div className="text-center py-20 bg-white shadow-sm rounded-lg border border-gray-100">
-            <p className="text-xl text-gray-600 mb-4">No products found.</p>
-            <Link
-              href="/sell"
-              className="text-blue-600 font-semibold hover:underline"
-            >
-              Be the first to list a product!
-            </Link>
+            <p className="text-xl text-gray-600">No products found.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-y-10 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:gap-x-8">
