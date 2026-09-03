@@ -66,17 +66,17 @@ export default function SignUpPage() {
         localStorage.setItem('uzananunua_user', JSON.stringify(userObj));
       }
 
-      // If registered as Seller, open the Sell / Product Listing page!
-      if (formData.role === 'Seller') {
-        setSuccess(`Seller account created for ${formData.name}! Opening product listing form...`);
+      const isSeller = String(formData.role || userObj?.role || '').trim().toLowerCase() === 'seller';
+      if (isSeller) {
+        setSuccess(`Seller account created for ${formData.name}! Opening Product Listing Page...`);
         setTimeout(() => {
-          router.push('/sell');
-        }, 1000);
+          window.location.href = '/sell';
+        }, 800);
       } else {
         setSuccess(`Buyer account created for ${formData.name}! Opening Buyer Dashboard...`);
         setTimeout(() => {
-          router.push('/buyer-dashboard');
-        }, 1000);
+          window.location.href = '/buyer-dashboard';
+        }, 800);
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during sign up');
@@ -88,12 +88,20 @@ export default function SignUpPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Link
-          href="/products"
-          className="text-sm font-semibold text-blue-600 hover:text-blue-500 mb-6 inline-block"
-        >
-          &larr; Back to Products
-        </Link>
+        <div className="flex items-center justify-center space-x-3 mb-6">
+          <Link
+            href="/products"
+            className="text-xs font-semibold text-blue-600 hover:text-blue-500 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs"
+          >
+            &larr; Products Marketplace
+          </Link>
+          <Link
+            href="/sell"
+            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl shadow-2xs"
+          >
+            + Product Listing Form
+          </Link>
+        </div>
         <h2 className="text-3xl font-black text-slate-900 tracking-tight">
           Create an Account
         </h2>
@@ -111,9 +119,19 @@ export default function SignUpPage() {
           )}
 
           {success && (
-            <div className="mb-4 bg-emerald-50 border-l-4 border-emerald-500 p-3.5 rounded-xl text-sm text-emerald-800 font-medium flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              {success}
+            <div className="mb-4 bg-emerald-50 border-2 border-emerald-300 p-4 rounded-2xl text-sm text-emerald-900 font-medium space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                <span className="font-bold">{success}</span>
+              </div>
+              <div>
+                <Link
+                  href="/sell"
+                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition"
+                >
+                  <span>Open Product Listing Form &rarr;</span>
+                </Link>
+              </div>
             </div>
           )}
 

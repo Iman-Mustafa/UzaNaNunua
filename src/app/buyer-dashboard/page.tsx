@@ -602,7 +602,33 @@ export default function BuyerDashboard() {
       {/* ========================================================================= */}
       {/* MAIN CONTENT AREA */}
       {/* ========================================================================= */}
-      <main className="flex-1 max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8 space-y-10">
+      <main className="flex-1 max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8 space-y-8">
+        {/* SELLER MODE CALLOUT */}
+        {String(currentUser?.role || '').toLowerCase() === 'seller' && (
+          <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-700 to-slate-900 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-12 h-12 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center text-2xl">
+                💼
+              </div>
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wider text-emerald-200">Seller Account Active</div>
+                <div className="text-base font-bold text-white">
+                  Welcome, {currentUser?.name}! Ready to list more products for sale?
+                </div>
+                <div className="text-xs text-slate-200">
+                  Buyers are browsing the marketplace right now.
+                </div>
+              </div>
+            </div>
+            <Link
+              href="/sell"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-white text-emerald-800 font-black text-sm shadow-md hover:bg-emerald-50 transition-all hover:scale-102 flex-shrink-0"
+            >
+              <span>+ Open Product Listing Form</span>
+              <span>&rarr;</span>
+            </Link>
+          </div>
+        )}
 
         {/* ----------------------------------------------------------------------- */}
         {/* TAB 1: LIKED PRODUCTS VIEW */}
