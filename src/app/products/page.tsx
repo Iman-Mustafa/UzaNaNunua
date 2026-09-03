@@ -13,6 +13,13 @@ interface Product {
   countInStock: number;
 }
 
+interface UserSession {
+  id: string;
+  name: string;
+  phone?: string;
+  role: 'Seller' | 'Buyer';
+}
+
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -20,6 +27,7 @@ export default function ProductsPage() {
   const [boughtIds, setBoughtIds] = useState<string[]>([]);
   const [likedIds, setLikedIds] = useState<string[]>([]);
   const [cartCount, setCartCount] = useState<number>(0);
+  const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
@@ -27,9 +35,24 @@ export default function ProductsPage() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  useEffect(() => {
-    // Read local buyer storage for bought items, liked items, cart
+  const handleLogout = () => {
     try {
+      localStorage.removeItem('uzananunua_user');
+      setCurrentUser(null);
+      showToast('Logged out successfully');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  useEffect(() => {
+    // Read local user & buyer storage
+    try {
+      const savedUser = localStorage.getItem('uzananunua_user');
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+      }
+
       const savedOrders = localStorage.getItem('uzananunua_orders');
       if (savedOrders) {
         const parsed = JSON.parse(savedOrders);
@@ -167,11 +190,11 @@ export default function ProductsPage() {
         </div>
       )}
 
-      {/* Top Header with Products Title/Brand, Buyer Dashboard, Login, and SignUp Buttons */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+      {/* Top Header with Products Title/Brand, Seller Action, Buyer Dashboard, Login/User Profile */}
+      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-4 sm:space-x-6">
+            <div className="flex items-center space-x-3 sm:space-x-4">
               <Link href="/" className="text-xl font-bold text-gray-900">
                 Uza<span className="text-blue-600">NaNunua</span>
               </Link>
@@ -182,15 +205,27 @@ export default function ProductsPage() {
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* PRIMARY SELLER ACTION: Always accessible link to Product Form */}
+              <Link
+                href="/sell"
+                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-all hover:scale-102"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                </svg>
+                <span>+ Sell Product</span>
+              </Link>
+
               {/* Direct Link to Buyer Dashboard */}
               <Link
                 href="/buyer-dashboard"
-                className="inline-flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-800 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 rounded-xl border border-slate-200 transition-all shadow-xs"
+                className="inline-flex items-center gap-2 px-3 py-2 text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 rounded-xl border border-slate-200 transition-all shadow-xs"
               >
                 <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span>Buyer Dashboard</span>
+                <span className="hidden sm:inline">Buyer Dashboard</span>
+                <span className="sm:hidden">Buyer</span>
                 {cartCount > 0 && (
                   <span className="px-1.5 py-0.2 rounded-full bg-blue-600 text-white text-[10px]">
                     {cartCount}
@@ -198,18 +233,39 @@ export default function ProductsPage() {
                 )}
               </Link>
 
-              <Link
-                href="/login"
-                className="px-3.5 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
-              >
-                Login
-              </Link>
-              <Link
-                href="/signup"
-                className="px-3.5 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
-              >
-                SignUp
-              </Link>
+              {/* User Authentication Status or Login/Signup */}
+              {currentUser ? (
+                <div className="flex items-center gap-2">
+                  <div className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700">
+                    <span>{currentUser.role === 'Seller' ? '💼' : '🛍️'}</span>
+                    <span className="max-w-[120px] truncate">{currentUser.name}</span>
+                    <span className="text-[10px] text-blue-600 font-bold px-1 rounded bg-blue-50">
+                      {currentUser.role}
+                    </span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-2 text-xs sm:text-sm font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-1.5 sm:space-x-2">
+                  <Link
+                    href="/login"
+                    className="px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors shadow-xs"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    href="/signup"
+                    className="px-3 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors shadow-xs"
+                  >
+                    SignUp
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -217,6 +273,30 @@ export default function ProductsPage() {
 
       {/* Main Content */}
       <main className="flex-1 max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
+        {/* SELLER MODE BANNER: Displays prominently if logged in as a seller */}
+        {currentUser?.role === 'Seller' && (
+          <div className="mb-6 p-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-600 to-blue-600 text-white shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-xl">
+                💼
+              </div>
+              <div>
+                <div className="text-xs font-bold uppercase tracking-wider text-emerald-100">Seller Mode Active</div>
+                <div className="text-sm sm:text-base font-bold">
+                  Welcome back, {currentUser.name}! You are signed in as a Seller.
+                </div>
+              </div>
+            </div>
+            <Link
+              href="/sell"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-white text-emerald-800 font-extrabold text-sm shadow-sm hover:bg-emerald-50 transition-all hover:scale-102"
+            >
+              <span>+ Open Product Information Form</span>
+              <span>&rarr;</span>
+            </Link>
+          </div>
+        )}
+
         <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -227,12 +307,21 @@ export default function ProductsPage() {
             </p>
           </div>
 
-          <Link
-            href="/buyer-dashboard"
-            className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-md hover:shadow-lg transition-all"
-          >
-            <span>Open Buyer Portal &rarr;</span>
-          </Link>
+          <div className="flex flex-wrap items-center gap-2.5">
+            <Link
+              href="/sell"
+              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all"
+            >
+              <span>+ List New Product</span>
+            </Link>
+
+            <Link
+              href="/buyer-dashboard"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md transition-all"
+            >
+              <span>Open Buyer Portal &rarr;</span>
+            </Link>
+          </div>
         </div>
 
         {loading ? (

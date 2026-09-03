@@ -34,17 +34,22 @@ export default function LoginPage() {
         throw new Error(data.message || 'Failed to login');
       }
 
-      const role = data.user?.role;
+      const userObj = data.user;
+      if (userObj) {
+        localStorage.setItem('uzananunua_user', JSON.stringify(userObj));
+      }
+
+      const role = userObj?.role;
       if (role === 'Seller') {
-        setSuccess('Login successful! Redirecting to seller portal...');
+        setSuccess(`Welcome back, ${userObj?.name || 'Seller'}! Redirecting to seller portal...`);
         setTimeout(() => {
           router.push('/sell');
-        }, 1200);
+        }, 1000);
       } else {
-        setSuccess('Login successful! Redirecting to Buyer Dashboard...');
+        setSuccess(`Welcome back, ${userObj?.name || 'Buyer'}! Redirecting to Buyer Dashboard...`);
         setTimeout(() => {
           router.push('/buyer-dashboard');
-        }, 1200);
+        }, 1000);
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');

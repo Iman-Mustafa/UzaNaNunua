@@ -26,8 +26,16 @@ interface OrderRecord {
   shippingAddress: string;
 }
 
+interface UserSession {
+  id: string;
+  name: string;
+  phone?: string;
+  role: 'Seller' | 'Buyer';
+}
+
 export default function BuyerDashboard() {
   const [activeTab, setActiveTab] = useState<'liked' | 'cart' | 'orders'>('orders');
+  const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [productsCatalog, setProductsCatalog] = useState<ProductItem[]>([]);
   const [likedProducts, setLikedProducts] = useState<ProductItem[]>([]);
   const [cartItems, setCartItems] = useState<{ product: ProductItem; quantity: number }[]>([]);
@@ -44,6 +52,16 @@ export default function BuyerDashboard() {
     setTimeout(() => {
       setNotification(null);
     }, 3500);
+  };
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('uzananunua_user');
+      setCurrentUser(null);
+      showToast('Logged out successfully');
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   // Initial load & seed
@@ -76,6 +94,11 @@ export default function BuyerDashboard() {
 
     // 2. Load from localStorage or initialize with rich realistic sample data
     try {
+      const savedUser = localStorage.getItem('uzananunua_user');
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+      }
+
       const savedLiked = localStorage.getItem('uzananunua_liked');
       const savedCart = localStorage.getItem('uzananunua_cart');
       const savedOrders = localStorage.getItem('uzananunua_orders');
@@ -492,14 +515,38 @@ export default function BuyerDashboard() {
               </button>
             </nav>
 
-            {/* Quick Actions / Link to All Products */}
+            {/* Quick Actions / Link to All Products & Sell */}
             <div className="flex items-center space-x-2 sm:space-x-3">
               <Link
+                href="/sell"
+                className="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all shadow-xs"
+              >
+                <span>+ Sell Product</span>
+              </Link>
+              <Link
                 href="/products"
-                className="hidden lg:inline-flex items-center px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 hover:border-slate-400 transition-all shadow-sm"
+                className="hidden lg:inline-flex items-center px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-300 rounded-xl hover:bg-slate-50 hover:border-slate-400 transition-all shadow-xs"
               >
                 Browse Catalog &rarr;
               </Link>
+
+              {currentUser ? (
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-2 text-xs sm:text-sm font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <Link
+                  href="/login"
+                  className="px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors shadow-xs"
+                >
+                  Login
+                </Link>
+              )}
             </div>
           </div>
         </div>

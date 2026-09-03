@@ -61,17 +61,22 @@ export default function SignUpPage() {
         throw new Error(data.message || 'Failed to create account');
       }
 
+      const userObj = data.user;
+      if (userObj) {
+        localStorage.setItem('uzananunua_user', JSON.stringify(userObj));
+      }
+
       // If registered as Seller, open the Sell / Product Listing page!
       if (formData.role === 'Seller') {
-        setSuccess('Seller registered successfully! Opening product listing page...');
+        setSuccess(`Seller account created for ${formData.name}! Opening product listing form...`);
         setTimeout(() => {
           router.push('/sell');
-        }, 1200);
+        }, 1000);
       } else {
-        setSuccess('Buyer account created successfully! Opening Buyer Dashboard...');
+        setSuccess(`Buyer account created for ${formData.name}! Opening Buyer Dashboard...`);
         setTimeout(() => {
           router.push('/buyer-dashboard');
-        }, 1200);
+        }, 1000);
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during sign up');

@@ -4,11 +4,20 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+interface UserSession {
+  id: string;
+  name: string;
+  phone?: string;
+  role: 'Seller' | 'Buyer';
+}
+
 export default function SellPage() {
   const router = useRouter();
+  const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [publishedProduct, setPublishedProduct] = useState<any>(null);
   
   const [formData, setFormData] = useState({
     category: '', // Type of product (Electronics, Clothes, Shoes, Wearables, Phones, etc.)
@@ -19,6 +28,42 @@ export default function SellPage() {
   });
   const [image, setImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string>('');
+
+  React.useEffect(() => {
+    try {
+      const savedUser = localStorage.getItem('uzananunua_user');
+      if (savedUser) {
+        setCurrentUser(JSON.parse(savedUser));
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    try {
+      localStorage.removeItem('uzananunua_user');
+      setCurrentUser(null);
+      router.push('/login');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      category: '',
+      name: '',
+      price: '',
+      countInStock: '',
+      description: '',
+    });
+    setImage(null);
+    setImagePreview('');
+    setSuccess('');
+    setPublishedProduct(null);
+    setError('');
+  };
 
   const categories = [
     { value: 'Electronics', label: 'Electronics', icon: '⚡' },
@@ -119,11 +164,8 @@ export default function SellPage() {
         throw new Error(errorMsg);
       }
 
-      setSuccess('🎉 Product submitted successfully! Publishing to products catalog...');
-      setTimeout(() => {
-        router.push('/products');
-        router.refresh();
-      }, 1300);
+      setPublishedProduct(responseData || { name: formData.name });
+      setSuccess(`🎉 Product "${formData.name}" submitted successfully! It is now live on the marketplace.`);
     } catch (err: any) {
       setError(err.message || 'An unexpected error occurred while listing the product');
     } finally {
@@ -145,26 +187,52 @@ export default function SellPage() {
               </Link>
               <span className="hidden sm:inline-block text-slate-300 text-lg">|</span>
               <div className="hidden sm:flex items-center gap-2">
-                <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
+                <span className="px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold border border-emerald-100 flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                   Seller Portal
                 </span>
                 <span className="text-xs text-slate-500 font-medium">Add New Product</span>
               </div>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
               <Link
                 href="/products"
-                className="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all"
+                className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition-all flex items-center gap-1.5"
               >
-                Browse Marketplace
+                <span>Browse Marketplace</span>
+                <span>&rarr;</span>
               </Link>
               <Link
                 href="/buyer-dashboard"
-                className="hidden md:inline-flex px-4 py-2 text-xs sm:text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all"
+                className="hidden md:inline-flex px-3.5 py-2 text-xs sm:text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-xl transition-all"
               >
                 Buyer Dashboard
               </Link>
+
+              {currentUser ? (
+                <div className="flex items-center gap-2">
+                  <div className="hidden lg:flex items-center gap-1 px-3 py-1.5 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700">
+                    <span>💼</span>
+                    <span className="max-w-[120px] truncate">{currentUser.name}</span>
+                  </div>
+                  <button
+                    onClick={handleLogout}
+                    className="px-3 py-2 text-xs sm:text-sm font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-1 sm:space-x-2">
+                  <Link
+                    href="/login"
+                    className="px-3 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors shadow-xs"
+                  >
+                    Login
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -173,38 +241,58 @@ export default function SellPage() {
       {/* Hero Header Section */}
       <section className="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 text-white py-10 px-4 sm:px-6 lg:px-8 shadow-sm">
         <div className="max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-bold text-blue-200 mb-3 border border-white/15">
-            <span>💼</span> SELLER PRODUCT LISTING
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 backdrop-blur-md text-xs font-bold text-emerald-300 mb-3 border border-white/15">
+            <span>💼</span> SELLER PRODUCT LISTING FORM
           </div>
           <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
-            List a Product for Sale
+            {currentUser ? `Welcome, ${currentUser.name}! List a Product` : 'List a Product for Sale'}
           </h1>
           <p className="mt-2 text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
-            Provide the product details below. Once submitted, your item will be immediately published and visible to buyers on the products page.
+            Provide the product details below. Once submitted, your item will be immediately published and visible to buyers on the marketplace.
           </p>
         </div>
       </section>
 
       {/* Main Content Area */}
       <main className="flex-1 max-w-5xl mx-auto w-full py-10 px-4 sm:px-6 lg:px-8">
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Notifications */}
-          {error && (
-            <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-2xl shadow-xs flex items-center justify-between">
-              <div className="flex items-center space-x-3">
-                <span className="text-red-500 text-xl font-bold">⚠️</span>
-                <p className="text-sm font-semibold text-red-700">{error}</p>
+        {/* Notifications & Post-Publish Actions */}
+        {error && (
+          <div className="mb-6 bg-red-50 border-l-4 border-red-500 p-4 rounded-2xl shadow-xs flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <span className="text-red-500 text-xl font-bold">⚠️</span>
+              <p className="text-sm font-semibold text-red-700">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {success && (
+          <div className="mb-8 bg-emerald-50 border-2 border-emerald-300 p-6 rounded-3xl shadow-sm text-emerald-900 space-y-4 animate-fadeIn">
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🎉</span>
+              <div>
+                <h3 className="font-black text-lg text-emerald-950">Product Successfully Listed!</h3>
+                <p className="text-sm font-medium text-emerald-800">{success}</p>
               </div>
             </div>
-          )}
-
-          {success && (
-            <div className="bg-emerald-50 border-l-4 border-emerald-500 p-4 rounded-2xl shadow-xs flex items-center space-x-3 text-emerald-800">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-              <p className="text-sm font-bold">{success}</p>
+            <div className="flex flex-wrap items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={resetForm}
+                className="px-5 py-2.5 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white text-xs sm:text-sm font-bold shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <span>+ List Another Product</span>
+              </button>
+              <Link
+                href="/products"
+                className="px-5 py-2.5 rounded-xl bg-white border border-emerald-300 text-emerald-900 hover:bg-emerald-100 text-xs sm:text-sm font-bold shadow-xs transition-all flex items-center gap-1.5"
+              >
+                <span>View in Marketplace &rarr;</span>
+              </Link>
             </div>
-          )}
+          </div>
+        )}
 
+        <form onSubmit={handleSubmit} className="space-y-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* ================================================================= */}
             {/* LEFT COLUMN: PRODUCT INFORMATION FORM FIELDS */}
