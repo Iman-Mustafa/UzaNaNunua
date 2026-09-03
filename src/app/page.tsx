@@ -2,22 +2,40 @@ import Link from 'next/link';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-8">
-      <main className="max-w-2xl text-center space-y-8">
-        <h1 className="text-5xl font-bold tracking-tight text-gray-900 sm:text-6xl">
+    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-6 sm:p-8 font-sans">
+      <main className="max-w-2xl text-center space-y-8 bg-white p-8 sm:p-12 rounded-3xl shadow-xl border border-slate-100">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">
+          <span>🛒</span> Premier Marketplace & Buyer Portal
+        </div>
+
+        <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-slate-900">
           Welcome to <span className="text-blue-600">UzaNaNunua</span>
         </h1>
         
-        <p className="text-xl leading-8 text-gray-600">
-          Your premier marketplace for buying and selling. We're currently getting things ready.
+        <p className="text-base sm:text-lg leading-relaxed text-slate-600">
+          Your premier marketplace for buying and selling. Explore catalog items, manage your wishlist, track cart orders, and view your purchase history with ease.
         </p>
 
-        <div className="flex justify-center mt-10 relative z-50">
+        <div className="flex flex-wrap items-center justify-center gap-3.5 pt-4">
+          <Link
+            href="/buyer-dashboard"
+            className="rounded-xl bg-blue-600 px-5 py-3 text-sm font-bold text-white shadow-md hover:bg-blue-700 hover:shadow-lg transition-all"
+          >
+            Buyer Dashboard &rarr;
+          </Link>
+
           <Link
             href="/products"
-            className="rounded-md bg-blue-600 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+            className="rounded-xl bg-slate-100 px-5 py-3 text-sm font-bold text-slate-800 hover:bg-slate-200 transition-all border border-slate-200"
           >
             Browse Products
+          </Link>
+
+          <Link
+            href="/sell"
+            className="rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-all border border-slate-300"
+          >
+            Sell a Product
           </Link>
         </div>
       </main>

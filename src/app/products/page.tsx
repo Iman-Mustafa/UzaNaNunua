@@ -17,11 +17,50 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [boughtIds, setBoughtIds] = useState<string[]>([]);
+  const [likedIds, setLikedIds] = useState<string[]>([]);
+  const [cartCount, setCartCount] = useState<number>(0);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => setToastMessage(null), 3000);
+  };
 
   useEffect(() => {
+    // Read local buyer storage for bought items, liked items, cart
+    try {
+      const savedOrders = localStorage.getItem('uzananunua_orders');
+      if (savedOrders) {
+        const parsed = JSON.parse(savedOrders);
+        const ids: string[] = [];
+        parsed.forEach((order: any) => {
+          order.items?.forEach((item: any) => {
+            if (item.id) ids.push(item.id);
+            if (item.name) ids.push(item.name.toLowerCase());
+          });
+        });
+        setBoughtIds(ids);
+      }
+
+      const savedLiked = localStorage.getItem('uzananunua_liked');
+      if (savedLiked) {
+        const parsedLiked = JSON.parse(savedLiked);
+        setLikedIds(parsedLiked.map((item: any) => item.id));
+      }
+
+      const savedCart = localStorage.getItem('uzananunua_cart');
+      if (savedCart) {
+        const parsedCart = JSON.parse(savedCart);
+        const count = parsedCart.reduce((sum: number, c: any) => sum + (c.quantity || 1), 0);
+        setCartCount(count);
+      }
+    } catch (e) {
+      console.error('Error reading localStorage in products page:', e);
+    }
+
     const fetchProducts = async () => {
       try {
-        // Use environment variable if set, otherwise use relative path to Next.js API route
         const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
         const response = await fetch(`${API_URL}/api/products`);
         
@@ -51,13 +90,88 @@ export default function ProductsPage() {
     fetchProducts();
   }, []);
 
+  const isBought = (product: Product) => {
+    return boughtIds.includes(product._id) || boughtIds.includes(product.name.toLowerCase());
+  };
+
+  const isLiked = (product: Product) => {
+    return likedIds.includes(product._id);
+  };
+
+  const handleToggleLike = (product: Product) => {
+    try {
+      const savedLiked = localStorage.getItem('uzananunua_liked');
+      let currentLiked = savedLiked ? JSON.parse(savedLiked) : [];
+      const itemObj = {
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        category: product.category,
+        image: product.image,
+        countInStock: product.countInStock,
+      };
+
+      if (isLiked(product)) {
+        currentLiked = currentLiked.filter((item: any) => item.id !== product._id);
+        setLikedIds(likedIds.filter((id) => id !== product._id));
+        showToast(`Removed "${product.name}" from Liked Products`);
+      } else {
+        currentLiked.push(itemObj);
+        setLikedIds([...likedIds, product._id]);
+        showToast(`Added "${product.name}" to Liked Products! ❤️`);
+      }
+      localStorage.setItem('uzananunua_liked', JSON.stringify(currentLiked));
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleAddToCart = (product: Product) => {
+    try {
+      const savedCart = localStorage.getItem('uzananunua_cart');
+      let currentCart = savedCart ? JSON.parse(savedCart) : [];
+      const itemObj = {
+        id: product._id,
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        category: product.category,
+        image: product.image,
+        countInStock: product.countInStock,
+      };
+
+      const existingIndex = currentCart.findIndex((ci: any) => ci.product?.id === product._id);
+      if (existingIndex > -1) {
+        currentCart[existingIndex].quantity += 1;
+      } else {
+        currentCart.push({ product: itemObj, quantity: 1 });
+      }
+
+      localStorage.setItem('uzananunua_cart', JSON.stringify(currentCart));
+      const totalCount = currentCart.reduce((sum: number, c: any) => sum + (c.quantity || 1), 0);
+      setCartCount(totalCount);
+      showToast(`Added "${product.name}" to MyCart! 🛒`);
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Top Header with Products Title/Brand, Login, and SignUp Buttons */}
+    <div className="min-h-screen bg-gray-50 flex flex-col font-sans">
+      {/* Toast */}
+      {toastMessage && (
+        <div className="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-xl flex items-center space-x-3 text-sm font-medium border border-slate-700 animate-bounce">
+          <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* Top Header with Products Title/Brand, Buyer Dashboard, Login, and SignUp Buttons */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-6">
+            <div className="flex items-center space-x-4 sm:space-x-6">
               <Link href="/" className="text-xl font-bold text-gray-900">
                 Uza<span className="text-blue-600">NaNunua</span>
               </Link>
@@ -67,16 +181,32 @@ export default function ProductsPage() {
               </span>
             </div>
 
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* Direct Link to Buyer Dashboard */}
+              <Link
+                href="/buyer-dashboard"
+                className="inline-flex items-center gap-2 px-3.5 py-2 text-xs sm:text-sm font-bold text-slate-800 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 rounded-xl border border-slate-200 transition-all shadow-xs"
+              >
+                <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                <span>Buyer Dashboard</span>
+                {cartCount > 0 && (
+                  <span className="px-1.5 py-0.2 rounded-full bg-blue-600 text-white text-[10px]">
+                    {cartCount}
+                  </span>
+                )}
+              </Link>
+
               <Link
                 href="/login"
-                className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+                className="px-3.5 py-2 text-xs sm:text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
               >
                 Login
               </Link>
               <Link
                 href="/signup"
-                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+                className="px-3.5 py-2 text-xs sm:text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
               >
                 SignUp
               </Link>
@@ -85,15 +215,24 @@ export default function ProductsPage() {
         </div>
       </header>
 
-      {/* Main Content: Products listed below the header */}
+      {/* Main Content */}
       <main className="flex-1 max-w-7xl mx-auto w-full py-8 px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Available Products
-          </h1>
-          <p className="mt-1 text-sm sm:text-base text-gray-600">
-            Browse items listed by sellers in our marketplace.
-          </p>
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+              Available Products
+            </h1>
+            <p className="mt-1 text-sm sm:text-base text-gray-600">
+              Browse items listed by sellers in our marketplace. Items you already bought are marked with a green sign.
+            </p>
+          </div>
+
+          <Link
+            href="/buyer-dashboard"
+            className="self-start sm:self-auto inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+          >
+            <span>Open Buyer Portal &rarr;</span>
+          </Link>
         </div>
 
         {loading ? (
@@ -122,49 +261,95 @@ export default function ProductsPage() {
               />
             </svg>
             <p className="text-xl font-medium text-gray-700">No products uploaded yet.</p>
-            <p className="text-sm text-gray-500 mt-1">Uploaded products will appear here automatically.</p>
+            <p className="text-sm text-gray-500 mt-1">Visit Buyer Dashboard to explore your orders and saved items.</p>
+            <div className="mt-4">
+              <Link
+                href="/buyer-dashboard"
+                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition"
+              >
+                Go to Buyer Dashboard
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((product) => (
-              <div
-                key={product._id}
-                className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden flex flex-col"
-              >
-                <div className="w-full h-56 bg-gray-100 overflow-hidden flex items-center justify-center">
-                  {product.image ? (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <span className="text-gray-400 text-sm">No Image</span>
-                  )}
-                </div>
-                <div className="p-4 flex flex-col flex-1">
-                  <div className="flex items-start justify-between gap-2">
-                    <h3 className="text-base font-semibold text-gray-900 line-clamp-1">
-                      {product.name}
-                    </h3>
-                    <p className="text-base font-bold text-blue-600 whitespace-nowrap">
-                      ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
-                    </p>
+            {products.map((product) => {
+              const bought = isBought(product);
+              const liked = isLiked(product);
+              return (
+                <div
+                  key={product._id}
+                  className="group bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-lg transition-all duration-200 overflow-hidden flex flex-col relative"
+                >
+                  {/* Product Image */}
+                  <div className="w-full h-56 bg-gray-100 overflow-hidden relative flex items-center justify-center">
+                    {product.image ? (
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <span className="text-gray-400 text-sm">No Image</span>
+                    )}
+
+                    {/* Like Button */}
+                    <button
+                      onClick={() => handleToggleLike(product)}
+                      className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all shadow-md ${
+                        liked
+                          ? 'bg-rose-500 text-white'
+                          : 'bg-white/90 text-slate-600 hover:text-rose-500'
+                      }`}
+                      title={liked ? 'Unlike product' : 'Like product'}
+                    >
+                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                        <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      </svg>
+                    </button>
+
+                    {/* SIGN: PROMINENT "ALREADY BOUGHT" INDICATOR */}
+                    {bought && (
+                      <div className="absolute bottom-2 left-2 right-2 bg-emerald-600/95 backdrop-blur-md text-white text-[11px] font-bold px-2.5 py-1 rounded-lg shadow-md flex items-center justify-center gap-1 border border-emerald-400">
+                        <span>✓ ALREADY BOUGHT</span>
+                      </div>
+                    )}
                   </div>
-                  <p className="mt-2 text-xs sm:text-sm text-gray-500 line-clamp-2 flex-1">
-                    {product.description}
-                  </p>
-                  <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between text-xs text-gray-500">
-                    <span className="inline-flex items-center px-2 py-0.5 rounded-full font-medium bg-blue-50 text-blue-700">
-                      {product.category}
-                    </span>
-                    <span>
-                      Stock: <strong className="text-gray-700">{product.countInStock}</strong>
-                    </span>
+
+                  {/* Product Info */}
+                  <div className="p-4 flex flex-col flex-1 justify-between">
+                    <div>
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="text-base font-semibold text-gray-900 line-clamp-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-base font-bold text-blue-600 whitespace-nowrap">
+                          ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
+                        </p>
+                      </div>
+                      <p className="mt-2 text-xs sm:text-sm text-gray-500 line-clamp-2 flex-1">
+                        {product.description}
+                      </p>
+                    </div>
+
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs bg-blue-50 text-blue-700">
+                        {product.category}
+                      </span>
+                      <button
+                        onClick={() => handleAddToCart(product)}
+                        className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
+                        </svg>
+                        Add to Cart
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </main>
