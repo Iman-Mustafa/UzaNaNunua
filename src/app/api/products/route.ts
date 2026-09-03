@@ -45,19 +45,32 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Convert file to Buffer for Cloudinary upload
+    // Convert file to Buffer
     const arrayBuffer = await imageFile.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    // Upload to Cloudinary
-    const uploadRes = await uploadImageToCloudinary(buffer);
+    // Attempt Cloudinary upload with graceful base64 fallback
+    let imageUrl = '';
+    try {
+      const uploadRes = await uploadImageToCloudinary(buffer);
+      if (uploadRes?.secure_url) {
+        imageUrl = uploadRes.secure_url;
+      }
+    } catch (uploadErr) {
+      console.warn('Cloudinary upload warning, applying fallback image data URL:', uploadErr);
+    }
+
+    if (!imageUrl) {
+      const mimeType = imageFile.type || 'image/jpeg';
+      imageUrl = `data:${mimeType};base64,${buffer.toString('base64')}`;
+    }
 
     const product = new Product({
-      name,
+      name: name.trim(),
       price: parseFloat(price),
-      description,
-      image: uploadRes.secure_url,
-      category,
+      description: description.trim(),
+      image: imageUrl,
+      category: category.trim(),
       countInStock: parseInt(countInStock, 10),
     });
 

@@ -9,7 +9,7 @@ export default function SignUpPage() {
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
-    role: 'Buyer', // default role
+    role: 'Seller', // default role or Buyer
     password: '',
     confirmPassword: '',
   });
@@ -61,10 +61,18 @@ export default function SignUpPage() {
         throw new Error(data.message || 'Failed to create account');
       }
 
-      setSuccess('Account created successfully! Redirecting to products...');
-      setTimeout(() => {
-        router.push('/products');
-      }, 1500);
+      // If registered as Seller, open the Sell / Product Listing page!
+      if (formData.role === 'Seller') {
+        setSuccess('Seller registered successfully! Opening product listing page...');
+        setTimeout(() => {
+          router.push('/sell');
+        }, 1200);
+      } else {
+        setSuccess('Buyer account created successfully! Opening Buyer Dashboard...');
+        setTimeout(() => {
+          router.push('/buyer-dashboard');
+        }, 1200);
+      }
     } catch (err: any) {
       setError(err.message || 'An error occurred during sign up');
     } finally {
@@ -73,41 +81,42 @@ export default function SignUpPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <Link
           href="/products"
           className="text-sm font-semibold text-blue-600 hover:text-blue-500 mb-6 inline-block"
         >
           &larr; Back to Products
         </Link>
-        <h2 className="text-center text-3xl font-extrabold text-gray-900 tracking-tight">
+        <h2 className="text-3xl font-black text-slate-900 tracking-tight">
           Create an Account
         </h2>
-        <p className="mt-2 text-center text-sm text-gray-600">
-          Join UzaNaNunua as a Seller or Buyer
+        <p className="mt-2 text-sm text-slate-600">
+          Join UzaNaNunua as a <span className="font-semibold text-blue-600">Seller</span> or <span className="font-semibold text-blue-600">Buyer</span>
         </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-sm border border-gray-200 rounded-2xl sm:px-10">
+        <div className="bg-white py-8 px-6 shadow-xl border border-slate-200 rounded-3xl sm:px-10">
           {error && (
-            <div className="mb-4 bg-red-50 border-l-4 border-red-500 p-3 rounded text-sm text-red-700">
+            <div className="mb-4 bg-red-50 border-l-4 border-red-500 p-3.5 rounded-xl text-sm text-red-700 font-medium">
               {error}
             </div>
           )}
 
           {success && (
-            <div className="mb-4 bg-green-50 border-l-4 border-green-500 p-3 rounded text-sm text-green-700">
+            <div className="mb-4 bg-emerald-50 border-l-4 border-emerald-500 p-3.5 rounded-xl text-sm text-emerald-800 font-medium flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               {success}
             </div>
           )}
 
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <form className="space-y-5" onSubmit={handleSubmit}>
             {/* 1. Name Field */}
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Name
+              <label htmlFor="name" className="block text-sm font-semibold text-slate-700">
+                Full Name
               </label>
               <div className="mt-1">
                 <input
@@ -117,15 +126,15 @@ export default function SignUpPage() {
                   required
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter your full name"
-                  className="appearance-none block w-full px-3.5 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  placeholder="e.g. John Doe"
+                  className="appearance-none block w-full px-3.5 py-2.5 border border-slate-300 rounded-xl shadow-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition"
                 />
               </div>
             </div>
 
             {/* 2. Phone Number Field */}
             <div>
-              <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="phone" className="block text-sm font-semibold text-slate-700">
                 Phone Number
               </label>
               <div className="mt-1">
@@ -137,47 +146,63 @@ export default function SignUpPage() {
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="e.g. +255 712 345 678"
-                  className="appearance-none block w-full px-3.5 py-2.5 border border-gray-300 rounded-lg shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full px-3.5 py-2.5 border border-slate-300 rounded-xl shadow-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition"
                 />
               </div>
             </div>
 
-            {/* 3. Role Field (with radio buttons on the right side to select Seller or Buyer) */}
-            <div className="flex items-center justify-between border border-gray-200 rounded-lg p-3 bg-gray-50/50">
-              <span className="text-sm font-medium text-gray-700">Role</span>
-              <div className="flex items-center space-x-6">
-                <label className="inline-flex items-center cursor-pointer">
+            {/* 3. Role Field (Seller or Buyer) */}
+            <div className="border border-slate-200 rounded-2xl p-4 bg-slate-50/70">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-bold text-slate-800">Account Type / Role</span>
+                <span className="text-xs text-blue-600 font-medium">
+                  {formData.role === 'Seller' ? '🛍️ List & Sell Products' : '🛒 Shop & Buy Products'}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-3 mt-1">
+                <label className={`flex items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all ${formData.role === 'Seller' ? 'border-blue-600 bg-blue-50/80 text-blue-900 font-bold shadow-xs' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>
                   <input
                     type="radio"
                     name="role"
                     value="Seller"
                     checked={formData.role === 'Seller'}
                     onChange={handleChange}
-                    className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    className="sr-only"
                   />
-                  <span className="ml-2 text-sm font-medium text-gray-700">Seller</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-base">💼</span>
+                    <span className="text-sm">Seller</span>
+                  </div>
                 </label>
 
-                <label className="inline-flex items-center cursor-pointer">
+                <label className={`flex items-center justify-center p-3 rounded-xl border-2 cursor-pointer transition-all ${formData.role === 'Buyer' ? 'border-blue-600 bg-blue-50/80 text-blue-900 font-bold shadow-xs' : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'}`}>
                   <input
                     type="radio"
                     name="role"
                     value="Buyer"
                     checked={formData.role === 'Buyer'}
                     onChange={handleChange}
-                    className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500"
+                    className="sr-only"
                   />
-                  <span className="ml-2 text-sm font-medium text-gray-700">Buyer</span>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-base">🛍️</span>
+                    <span className="text-sm">Buyer</span>
+                  </div>
                 </label>
               </div>
+              {formData.role === 'Seller' && (
+                <p className="text-[11px] text-slate-500 mt-2">
+                  * As a seller, you will be redirected immediately to list your product after registration.
+                </p>
+              )}
             </div>
 
             {/* 4. Password Field with Visibility Toggle Icon */}
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="password" className="block text-sm font-semibold text-slate-700">
                 Password
               </label>
-              <div className="mt-1 relative rounded-lg shadow-sm">
+              <div className="mt-1 relative rounded-xl shadow-xs">
                 <input
                   id="password"
                   name="password"
@@ -186,13 +211,13 @@ export default function SignUpPage() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="appearance-none block w-full pl-3.5 pr-10 py-2.5 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full pl-3.5 pr-10 py-2.5 border border-slate-300 rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
                 >
                   {showPassword ? (
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -225,10 +250,10 @@ export default function SignUpPage() {
 
             {/* 5. Confirm Password Field with Visibility Toggle Icon */}
             <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+              <label htmlFor="confirmPassword" className="block text-sm font-semibold text-slate-700">
                 Confirm Password
               </label>
-              <div className="mt-1 relative rounded-lg shadow-sm">
+              <div className="mt-1 relative rounded-xl shadow-xs">
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -237,13 +262,13 @@ export default function SignUpPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="appearance-none block w-full pl-3.5 pr-10 py-2.5 border border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="appearance-none block w-full pl-3.5 pr-10 py-2.5 border border-slate-300 rounded-xl placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600 focus:outline-none"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none"
                 >
                   {showConfirmPassword ? (
                     <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -275,20 +300,24 @@ export default function SignUpPage() {
             </div>
 
             {/* 6. Submit Button */}
-            <div>
+            <div className="pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors disabled:opacity-60"
+                className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all disabled:opacity-60"
               >
-                {loading ? 'Creating Account...' : 'Sign Up'}
+                {loading
+                  ? 'Creating Account...'
+                  : formData.role === 'Seller'
+                  ? 'Register as Seller & List Products'
+                  : 'Register as Buyer'}
               </button>
             </div>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-600">
+          <div className="mt-6 text-center text-sm text-slate-600">
             Already have an account?{' '}
-            <Link href="/login" className="font-semibold text-blue-600 hover:underline">
+            <Link href="/login" className="font-bold text-blue-600 hover:underline">
               Log in
             </Link>
           </div>
