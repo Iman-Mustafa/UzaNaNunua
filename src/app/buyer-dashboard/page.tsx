@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 
 interface ProductItem {
   id: string;
@@ -402,7 +403,8 @@ export default function BuyerDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             {/* Logo & Title */}
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2.5 sm:space-x-4">
+              <BackButton fallbackUrl="/" label="Back" title="Back to previous page" />
               <Link href="/" className="flex items-center space-x-2 group">
                 <span className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
                   Uza<span className="text-blue-600">NaNunua</span>

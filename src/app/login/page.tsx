@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import BackButton from '@/components/BackButton';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -61,19 +62,22 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="flex items-center justify-center space-x-3 mb-6">
-          <Link
-            href="/products"
-            className="text-xs font-semibold text-blue-600 hover:text-blue-500 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs"
-          >
-            &larr; Products Marketplace
-          </Link>
-          <Link
-            href="/sell"
-            className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl shadow-2xs"
-          >
-            + Product Listing Form
-          </Link>
+        <div className="flex items-center justify-between mb-6">
+          <BackButton fallbackUrl="/products" label="Back" variant="outline" title="Back to previous page" responsiveText={false} />
+          <div className="flex items-center space-x-2">
+            <Link
+              href="/products"
+              className="text-xs font-semibold text-blue-600 hover:text-blue-500 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs"
+            >
+              Marketplace
+            </Link>
+            <Link
+              href="/sell"
+              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl shadow-2xs"
+            >
+              + Sell
+            </Link>
+          </div>
         </div>
         <h2 className="text-3xl font-black text-slate-900 tracking-tight">
           Sign In

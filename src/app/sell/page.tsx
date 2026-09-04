@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import BackButton from '@/components/BackButton';
 
 interface UserSession {
   id: string;
@@ -179,7 +180,8 @@ export default function SellPage() {
       <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-18">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2.5 sm:space-x-4">
+              <BackButton fallbackUrl="/products" label="Back" title="Back to previous page" />
               <Link href="/" className="flex items-center space-x-2 group">
                 <span className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
                   Uza<span className="text-blue-600">NaNunua</span>

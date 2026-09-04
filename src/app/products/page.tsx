@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import BackButton from '@/components/BackButton';
 
 interface Product {
   _id: string;
@@ -194,7 +195,8 @@ export default function ProductsPage() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3 sm:space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
+              <BackButton fallbackUrl="/" label="Back" title="Back to previous page" />
               <Link href="/" className="text-xl font-bold text-gray-900">
                 Uza<span className="text-blue-600">NaNunua</span>
               </Link>
