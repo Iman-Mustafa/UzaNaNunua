@@ -110,18 +110,12 @@ export default function Home() {
             </p>
 
             {/* CTA Buttons */}
-            <div className="mt-7 sm:mt-9 flex flex-col xs:flex-row items-center justify-center gap-3 max-w-sm xs:max-w-none mx-auto">
+            <div className="mt-7 sm:mt-9 flex justify-center">
               <Link
                 href="/products"
-                className="w-full xs:w-auto flex items-center justify-center gap-2 px-7 py-3.5 text-sm sm:text-base font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-2xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] min-h-[48px]"
+                className="flex items-center justify-center gap-2 px-8 py-4 text-sm sm:text-base font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-2xl shadow-md hover:shadow-lg transition-all active:scale-[0.98] min-h-[48px] min-w-[220px]"
               >
                 Browse Products &rarr;
-              </Link>
-              <Link
-                href="/login"
-                className="w-full xs:w-auto flex items-center justify-center gap-2 px-7 py-3.5 text-sm sm:text-base font-semibold text-slate-700 bg-white hover:bg-slate-50 border border-slate-200 rounded-2xl shadow-sm transition-all min-h-[48px]"
-              >
-                Sign In to Account
               </Link>
             </div>
 
