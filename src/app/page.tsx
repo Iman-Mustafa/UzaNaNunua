@@ -197,47 +197,125 @@ export default function Home() {
             </div>
           </div>
         </section>
-
-        {/* ── 4. BOTTOM CTA BANNER ────────────────────────────── */}
-        <section className="bg-gradient-to-r from-blue-600 to-indigo-700 py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-8 text-center sm:text-left">
-            <div>
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-white">
-                Ready to start shopping?
-              </h2>
-              <p className="mt-1 text-sm sm:text-base text-blue-100">
-                Create a free account or browse the catalog right away.
-              </p>
-            </div>
-            <div className="flex flex-col xs:flex-row gap-3 shrink-0">
-              <Link
-                href="/signup"
-                className="px-6 py-3 text-sm font-bold text-blue-700 bg-white hover:bg-blue-50 rounded-xl transition-all shadow-sm min-h-[44px] flex items-center justify-center"
-              >
-                Create Free Account
-              </Link>
-              <Link
-                href="/products"
-                className="px-6 py-3 text-sm font-bold text-white border-2 border-white/40 hover:bg-white/10 rounded-xl transition-all min-h-[44px] flex items-center justify-center"
-              >
-                Browse Products
-              </Link>
-            </div>
-          </div>
-        </section>
       </main>
 
       {/* ─────────────────────────────────────────────────────── */}
-      {/* FOOTER                                                  */}
+      {/* RICH APP FOOTER                                         */}
       {/* ─────────────────────────────────────────────────────── */}
-      <footer className="w-full bg-white border-t border-slate-200 py-5 sm:py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
-          <p>&copy; {new Date().getFullYear()} UzaNaNunua Marketplace. All rights reserved.</p>
-          <div className="flex items-center gap-4 font-medium text-slate-600">
-            <Link href="/products" className="hover:text-blue-600 transition-colors">Products</Link>
-            <Link href="/sell" className="hover:text-blue-600 transition-colors">Sell</Link>
-            <Link href="/login" className="hover:text-blue-600 transition-colors">Login</Link>
-            <Link href="/signup" className="hover:text-blue-600 transition-colors">Register</Link>
+      <footer className="w-full bg-slate-900 text-slate-300">
+        {/* Top footer: 4-column grid on desktop, stacked on mobile */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+          {/* Col 1 — Brand & About */}
+          <div className="space-y-4">
+            <Link href="/" className="inline-flex items-center gap-2 group">
+              <span className="text-2xl font-black tracking-tight text-white group-hover:text-blue-400 transition-colors">
+                Uza<span className="text-blue-400">NaNunua</span>
+              </span>
+            </Link>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              UzaNaNunua is a premier East African online marketplace connecting buyers and sellers of electronics, fashion, footwear, phones, and everyday essentials — all in one place.
+            </p>
+            <div className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              Platform is Live & Active
+            </div>
+          </div>
+
+          {/* Col 2 — Quick Navigation */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Quick Links</h4>
+            <ul className="space-y-2.5 text-sm">
+              {[
+                { label: 'Browse Products',    href: '/products' },
+                { label: 'Sell a Product',     href: '/sell' },
+                { label: 'Buyer Dashboard',    href: '/buyer-dashboard' },
+                { label: 'Sign In',            href: '/login' },
+                { label: 'Create an Account',  href: '/signup' },
+              ].map((link) => (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    className="text-slate-400 hover:text-white transition-colors flex items-center gap-2 group"
+                  >
+                    <span className="w-1 h-1 rounded-full bg-slate-600 group-hover:bg-blue-400 transition-colors" />
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 3 — Categories */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">Categories</h4>
+            <ul className="space-y-2.5 text-sm">
+              {[
+                { label: 'Electronics',   icon: '⚡' },
+                { label: 'Clothing',      icon: '👕' },
+                { label: 'Shoes',         icon: '👟' },
+                { label: 'Phones',        icon: '📱' },
+                { label: 'Wearables',     icon: '⌚' },
+                { label: 'Home & Living', icon: '🏡' },
+              ].map((cat) => (
+                <li key={cat.label}>
+                  <Link
+                    href="/products"
+                    className="text-slate-400 hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    <span className="text-sm">{cat.icon}</span>
+                    {cat.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Col 4 — App Info */}
+          <div className="space-y-4">
+            <h4 className="text-xs font-bold uppercase tracking-widest text-slate-400">App Details</h4>
+            <ul className="space-y-3 text-sm text-slate-400">
+              <li className="flex items-start gap-2.5">
+                <span className="text-base mt-0.5">📍</span>
+                <span>Dar es Salaam, Tanzania</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="text-base mt-0.5">🌐</span>
+                <span>Available on all web devices &amp; browsers</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="text-base mt-0.5">🔒</span>
+                <span>Secure user authentication &amp; data protection</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="text-base mt-0.5">💳</span>
+                <span>Supports instant cart checkout &amp; order tracking</span>
+              </li>
+              <li className="flex items-start gap-2.5">
+                <span className="text-base mt-0.5">🛠️</span>
+                <span>Built with Next.js, MongoDB &amp; Cloudinary</span>
+              </li>
+            </ul>
+
+            {/* CTA inside footer */}
+            <div className="pt-2">
+              <Link
+                href="/signup"
+                className="inline-flex items-center gap-2 px-4 py-2.5 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 rounded-xl transition-all shadow"
+              >
+                🚀 Get Started Free
+              </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom bar */}
+        <div className="border-t border-slate-800">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-slate-500">
+            <p>&copy; {new Date().getFullYear()} UzaNaNunua Marketplace. All rights reserved.</p>
+            <p className="text-slate-600">
+              Designed for buyers &amp; sellers · East Africa&apos;s digital marketplace
+            </p>
           </div>
         </div>
       </footer>
@@ -245,3 +323,4 @@ export default function Home() {
     </div>
   );
 }
+
