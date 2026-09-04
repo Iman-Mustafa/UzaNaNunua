@@ -45,28 +45,14 @@ export default function Home() {
             Your all-in-one marketplace for buying and selling. Explore trending products, manage wishlists, track real-time cart orders, and list items with instant buyer connectivity.
           </p>
 
-          {/* Action Buttons - Stack on mobile, flex on tablet/desktop */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-3.5 pt-2 max-w-2xl mx-auto">
-            <Link
-              href="/buyer-dashboard"
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-blue-600 px-5 py-3.5 text-sm font-bold text-white shadow-md hover:bg-blue-700 hover:shadow-lg active:scale-98 transition-all"
-            >
-              <span>Buyer Dashboard</span>
-              <span>&rarr;</span>
-            </Link>
-
+          {/* Primary Action Button */}
+          <div className="flex justify-center pt-2">
             <Link
               href="/products"
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-slate-100 px-5 py-3.5 text-sm font-bold text-slate-800 hover:bg-slate-200 active:scale-98 transition-all border border-slate-200"
+              className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-98 text-white px-8 py-4 text-base font-bold shadow-lg hover:shadow-xl transition-all min-w-[220px]"
             >
               <span>Browse Products</span>
-            </Link>
-
-            <Link
-              href="/sell"
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-white px-5 py-3.5 text-sm font-bold text-emerald-700 hover:bg-emerald-50 active:scale-98 transition-all border border-emerald-300 shadow-2xs"
-            >
-              <span>+ Sell a Product</span>
+              <span className="text-lg">&rarr;</span>
             </Link>
           </div>
 
