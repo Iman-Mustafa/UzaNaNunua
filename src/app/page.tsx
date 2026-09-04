@@ -91,7 +91,7 @@ export default function Home() {
           {/* Ambient glow */}
           <div className="absolute inset-x-0 top-0 h-72 bg-gradient-to-br from-blue-100/50 via-indigo-50/30 to-transparent blur-3xl pointer-events-none" />
 
-          <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 md:py-28 text-center">
+          <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 sm:pt-16 md:pt-20 pb-6 sm:pb-8 text-center">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-blue-200 text-blue-700 text-xs sm:text-sm font-semibold shadow-sm mb-5 sm:mb-7">
               🛒 Premier Marketplace & Buyer Portal
@@ -131,28 +131,34 @@ export default function Home() {
         </section>
 
         {/* ── 2. CATEGORIES ───────────────────────────────────── */}
-        <section className="bg-white border-t border-slate-100 py-10 sm:py-14 px-4 sm:px-6 lg:px-8">
+        <section className="bg-white border-t border-slate-100 pt-5 sm:pt-7 pb-8 sm:pb-12 px-4 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-7 sm:mb-10">
-              <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
+            <div className="text-center mb-4 sm:mb-6">
+              <h2 className="text-lg sm:text-xl md:text-2xl font-black text-slate-900 tracking-tight">
                 Explore Popular Categories
               </h2>
-              <p className="mt-1 text-sm sm:text-base text-slate-500">
+              <p className="mt-0.5 text-xs sm:text-sm text-slate-500">
                 Find exactly what you need in our marketplace
               </p>
             </div>
 
-            {/* 2 cols on phones → 3 on sm → 6 on lg */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+            {/* Vertical card grid: 1 col mobile → 2 cols sm → 3 cols lg */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
               {categories.map((cat) => (
                 <Link
                   key={cat.name}
                   href="/products"
-                  className={`group flex flex-col items-center p-4 sm:p-5 rounded-2xl border bg-white hover:shadow-md text-center transition-all duration-200 hover:-translate-y-1 ${cat.color}`}
+                  className={`group flex flex-row items-center gap-4 px-4 py-3.5 rounded-2xl border bg-white hover:shadow-md transition-all duration-200 hover:-translate-y-0.5 ${cat.color}`}
                 >
-                  <span className="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform">{cat.icon}</span>
-                  <span className="font-bold text-xs sm:text-sm text-slate-800 group-hover:text-blue-600 transition-colors">{cat.name}</span>
-                  <span className="text-[11px] sm:text-xs text-slate-500 mt-0.5 leading-tight line-clamp-1">{cat.desc}</span>
+                  {/* Icon column */}
+                  <span className="text-2xl sm:text-3xl shrink-0 group-hover:scale-110 transition-transform">{cat.icon}</span>
+                  {/* Text column */}
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-bold text-sm text-slate-800 group-hover:text-blue-600 transition-colors leading-tight">{cat.name}</span>
+                    <span className="text-xs text-slate-500 mt-0.5 leading-tight truncate">{cat.desc}</span>
+                  </div>
+                  {/* Arrow */}
+                  <span className="ml-auto text-slate-300 group-hover:text-blue-400 transition-colors text-sm shrink-0">&rarr;</span>
                 </Link>
               ))}
             </div>
