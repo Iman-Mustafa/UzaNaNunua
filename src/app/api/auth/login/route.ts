@@ -40,18 +40,22 @@ export async function POST(req: NextRequest) {
       orConditions.push({ phone: { $regex: new RegExp(escapeRegex(matchSuffix)) } });
     }
 
-    const user = await User.findOne({ $or: orConditions });
+    const matchingUsers = await User.find({ $or: orConditions });
 
-    if (!user) {
+    if (!matchingUsers || matchingUsers.length === 0) {
       return NextResponse.json(
         { message: 'No account found with that name or phone number. Please check your details or sign up.' },
         { status: 401 }
       );
     }
 
-    // Check password (plain text comparison, trimmed)
-    const userPass = String(user.password || '').trim();
-    if (!userPass || userPass !== password) {
+    // Check if any matching user account has the matching password
+    const user = matchingUsers.find((u) => {
+      const uPass = String(u.password || '').trim();
+      return uPass === password;
+    });
+
+    if (!user) {
       return NextResponse.json(
         { message: 'Incorrect password. Please try again.' },
         { status: 401 }
