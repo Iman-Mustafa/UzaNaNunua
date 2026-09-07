@@ -209,16 +209,18 @@ export default function ProductsPage() {
             </div>
 
             <div className="flex items-center space-x-2 sm:space-x-3">
-              {/* PRIMARY SELLER ACTION: Always accessible link to Product Form */}
-              <Link
-                href="/sell"
-                className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-all hover:scale-102"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                </svg>
-                <span>+ Sell Product</span>
-              </Link>
+              {/* PRIMARY SELLER ACTION: Only visible for sellers / non-buyers */}
+              {String(currentUser?.role || '').toLowerCase() !== 'buyer' && (
+                <Link
+                  href="/sell"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-all hover:scale-102"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                  </svg>
+                  <span>+ Sell Product</span>
+                </Link>
+              )}
 
               {/* Direct Link to Buyer Dashboard */}
               <Link
@@ -312,12 +314,14 @@ export default function ProductsPage() {
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5">
-            <Link
-              href="/sell"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all"
-            >
-              <span>+ List New Product</span>
-            </Link>
+            {String(currentUser?.role || '').toLowerCase() !== 'buyer' && (
+              <Link
+                href="/sell"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all"
+              >
+                <span>+ List New Product</span>
+              </Link>
+            )}
 
             <Link
               href="/buyer-dashboard"

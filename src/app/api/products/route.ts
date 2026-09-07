@@ -30,6 +30,14 @@ export async function POST(req: NextRequest) {
     const category = formData.get('category') as string;
     const countInStock = formData.get('countInStock') as string;
     const imageFile = formData.get('image') as File | null;
+    const userRole = formData.get('userRole') as string;
+
+    if (userRole && String(userRole).toLowerCase() === 'buyer') {
+      return NextResponse.json(
+        { message: 'Buyer accounts only have capability to buy products and cannot sell or list products.' },
+        { status: 403 }
+      );
+    }
 
     if (!name || !price || !description || !category || !countInStock) {
       return NextResponse.json(

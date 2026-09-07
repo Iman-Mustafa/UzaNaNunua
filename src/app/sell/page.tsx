@@ -139,6 +139,12 @@ export default function SellPage() {
       return;
     }
 
+    if (String(currentUser?.role || '').toLowerCase() === 'buyer') {
+      setError('Buyer accounts do not have permission to sell products. Only Seller accounts can list products.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const data = new FormData();
       data.append('category', formData.category);
@@ -147,6 +153,7 @@ export default function SellPage() {
       data.append('countInStock', formData.countInStock);
       data.append('description', formData.description);
       data.append('image', image);
+      data.append('userRole', currentUser?.role || '');
 
       const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
       const response = await fetch(`${API_URL}/api/products`, {
@@ -173,6 +180,75 @@ export default function SellPage() {
       setLoading(false);
     }
   };
+
+  // If user is a Buyer, restrict capability to sell
+  if (currentUser && String(currentUser.role).toLowerCase() === 'buyer') {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
+        <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-18">
+              <div className="flex items-center space-x-2.5 sm:space-x-4">
+                <BackButton fallbackUrl="/buyer-dashboard" label="Back" title="Back to Buyer Dashboard" />
+                <Link href="/" className="flex items-center space-x-2 group">
+                  <span className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                    Uza<span className="text-blue-600">NaNunua</span>
+                  </span>
+                </Link>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Link
+                  href="/buyer-dashboard"
+                  className="px-3.5 py-2 text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-xs"
+                >
+                  Go to Buyer Dashboard &rarr;
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="px-3 py-2 text-xs sm:text-sm font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 max-w-2xl mx-auto w-full px-4 py-16 flex flex-col items-center justify-center text-center">
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-xl w-full">
+            <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 mx-auto flex items-center justify-center text-3xl mb-5 shadow-inner">
+              🛒
+            </div>
+            <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100 uppercase tracking-wider">
+              Buyer Account
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-3 mb-3">
+              Selling is Restricted for Buyers
+            </h1>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-md mx-auto mb-8">
+              Hello <strong className="text-slate-900">{currentUser.name}</strong>, your account is registered as a <strong className="text-blue-600">Buyer</strong>. Buyers only have the capability to buy products and cannot list products for sale.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/buyer-dashboard"
+                className="px-6 py-3.5 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                <span>Go to Buyer Dashboard</span>
+                <span>&rarr;</span>
+              </Link>
+              <Link
+                href="/products"
+                className="px-6 py-3.5 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm hover:bg-slate-200 border border-slate-200 transition-all flex items-center justify-center"
+              >
+                Browse Marketplace Products
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800 selection:bg-blue-600 selection:text-white">
