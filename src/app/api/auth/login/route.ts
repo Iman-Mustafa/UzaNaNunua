@@ -18,22 +18,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Find user by name (case-insensitive)
+    const trimmedName = name.trim();
+    const trimmedPassword = password.trim();
+
+    // Find user by name (case-insensitive, trimmed)
     const user = await User.findOne({
-      name: { $regex: new RegExp(`^${name.trim()}$`, 'i') },
+      name: { $regex: new RegExp(`^${trimmedName}$`, 'i') },
     });
 
     if (!user) {
       return NextResponse.json(
-        { message: 'Invalid name or password.' },
+        { message: 'No account found with that name. Please check your name or sign up.' },
         { status: 401 }
       );
     }
 
-    // Check password
-    if (user.password !== password) {
+    // Check password (plain text comparison, trimmed)
+    if (!user.password || user.password.trim() !== trimmedPassword) {
       return NextResponse.json(
-        { message: 'Invalid name or password.' },
+        { message: 'Incorrect password. Please try again.' },
         { status: 401 }
       );
     }
@@ -52,6 +55,15 @@ export async function POST(req: NextRequest) {
     );
   } catch (error: any) {
     console.error('Error during login:', error);
+
+    // Specific message if DB is not connected
+    if (error.message?.includes('MONGO_URI') || error.message?.includes('connect')) {
+      return NextResponse.json(
+        { message: 'Database connection failed. Please try again later.' },
+        { status: 503 }
+      );
+    }
+
     return NextResponse.json(
       { message: error.message || 'Server error during login' },
       { status: 500 }
