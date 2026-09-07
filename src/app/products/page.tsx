@@ -303,33 +303,13 @@ export default function ProductsPage() {
           </div>
         )}
 
-        <div className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-              Available Products
-            </h1>
-            <p className="mt-1 text-sm sm:text-base text-gray-600">
-              Browse items listed by sellers in our marketplace. Items you already bought are marked with a green sign.
-            </p>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-2.5">
-            {String(currentUser?.role || '').toLowerCase() !== 'buyer' && (
-              <Link
-                href="/sell"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs sm:text-sm font-bold shadow-sm hover:shadow-md transition-all"
-              >
-                <span>+ List New Product</span>
-              </Link>
-            )}
-
-            <Link
-              href="/buyer-dashboard"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md transition-all"
-            >
-              <span>Open Buyer Portal &rarr;</span>
-            </Link>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+            Available Products
+          </h1>
+          <p className="mt-1 text-sm sm:text-base text-gray-600">
+            Browse items listed by sellers in our marketplace. Items you already bought are marked with a green sign.
+          </p>
         </div>
 
         {loading ? (
