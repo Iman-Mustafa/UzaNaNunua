@@ -91,24 +91,11 @@ export default function SignUpPage() {
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="flex items-center justify-between mb-6">
           <BackButton fallbackUrl="/products" label="Back" variant="outline" title="Back to previous page" responsiveText={false} />
-          <div className="flex items-center space-x-2">
-            <Link
-              href="/products"
-              className="text-xs font-semibold text-blue-600 hover:text-blue-500 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-2xs"
-            >
-              Marketplace
-            </Link>
-            <Link
-              href="/sell"
-              className="text-xs font-bold text-emerald-700 hover:text-emerald-800 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-xl shadow-2xs"
-            >
-              + Sell
-            </Link>
-          </div>
+          <h2 className="text-3xl font-black text-slate-900 tracking-tight">
+            Create an Account
+          </h2>
+          <div className="w-[72px]" />
         </div>
-        <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-          Create an Account
-        </h2>
         <p className="mt-2 text-sm text-slate-600">
           Join UzaNaNunua as a <span className="font-semibold text-blue-600">Seller</span> or <span className="font-semibold text-blue-600">Buyer</span>
         </p>
@@ -127,14 +114,6 @@ export default function SignUpPage() {
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
                 <span className="font-bold">{success}</span>
-              </div>
-              <div>
-                <Link
-                  href="/sell"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition"
-                >
-                  <span>Open Product Listing Form &rarr;</span>
-                </Link>
               </div>
             </div>
           )}

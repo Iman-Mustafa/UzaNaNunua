@@ -88,14 +88,6 @@ export default function LoginPage() {
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
                 <span className="font-bold">{success}</span>
               </div>
-              <div>
-                <Link
-                  href="/sell"
-                  className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition"
-                >
-                  <span>Go to Product Listing Form &rarr;</span>
-                </Link>
-              </div>
             </div>
           )}
 
