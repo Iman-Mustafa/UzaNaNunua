@@ -61,13 +61,16 @@ export default function BuyerDashboard() {
     try {
       localStorage.removeItem('uzananunua_user');
       setCurrentUser(null);
+      setLikedProducts([]);
+      setCartItems([]);
+      setOrders([]);
       router.push('/');
     } catch (e) {
       console.error(e);
     }
   };
 
-  // Initial load & seed
+  // Initial load
   useEffect(() => {
     // 1. Fetch available products from API if available
     const loadProducts = async () => {
@@ -95,129 +98,33 @@ export default function BuyerDashboard() {
 
     loadProducts();
 
-    // 2. Load from localStorage or initialize with rich realistic sample data
+    // 2. Load from localStorage if user is signed in
     try {
       const savedUser = localStorage.getItem('uzananunua_user');
       if (savedUser) {
         setCurrentUser(JSON.parse(savedUser));
-      }
 
-      const savedLiked = localStorage.getItem('uzananunua_liked');
-      const savedCart = localStorage.getItem('uzananunua_cart');
-      const savedOrders = localStorage.getItem('uzananunua_orders');
+        const savedLiked = localStorage.getItem('uzananunua_liked');
+        const savedCart = localStorage.getItem('uzananunua_cart');
+        const savedOrders = localStorage.getItem('uzananunua_orders');
 
-      if (savedLiked) {
-        setLikedProducts(JSON.parse(savedLiked));
+        if (savedLiked) {
+          setLikedProducts(JSON.parse(savedLiked));
+        }
+
+        if (savedCart) {
+          setCartItems(JSON.parse(savedCart));
+        }
+
+        if (savedOrders) {
+          const parsedOrders: OrderRecord[] = JSON.parse(savedOrders);
+          setOrders(parsedOrders);
+        }
       } else {
-        // Initial liked sample items
-        const initialLiked: ProductItem[] = [
-          {
-            id: 'demo-1',
-            name: 'Sony WH-1000XM5 Wireless Headphones',
-            price: 349.99,
-            description: 'Industry-leading noise canceling wireless over-ear headphones with auto NC optimizer.',
-            category: 'Electronics',
-            image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80',
-            countInStock: 8,
-          },
-          {
-            id: 'demo-2',
-            name: 'Minimalist Titanium Quartz Watch',
-            price: 189.5,
-            description: 'Ultra-slim sapphire crystal water-resistant analog timepiece.',
-            category: 'Accessories',
-            image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80',
-            countInStock: 15,
-          },
-        ];
-        setLikedProducts(initialLiked);
-        localStorage.setItem('uzananunua_liked', JSON.stringify(initialLiked));
-      }
-
-      if (savedCart) {
-        setCartItems(JSON.parse(savedCart));
-      } else {
-        // Initial cart sample item
-        const initialCart = [
-          {
-            product: {
-              id: 'demo-3',
-              name: 'Eco-Leather Ergonomic Office Chair',
-              price: 229.0,
-              description: 'Breathable high-back lumbar support workstation executive chair.',
-              category: 'Home & Office',
-              image: 'https://images.unsplash.com/photo-1580481077195-c3a821a58875?w=600&auto=format&fit=crop&q=80',
-              countInStock: 5,
-            },
-            quantity: 1,
-          },
-        ];
-        setCartItems(initialCart);
-        localStorage.setItem('uzananunua_cart', JSON.stringify(initialCart));
-      }
-
-      if (savedOrders) {
-        const parsedOrders: OrderRecord[] = JSON.parse(savedOrders);
-        setOrders(parsedOrders);
-      } else {
-        // Initial sample orders with already bought products
-        const initialOrders: OrderRecord[] = [
-          {
-            id: 'ORD-89421',
-            date: 'March 1, 2026',
-            totalPrice: 419.98,
-            status: 'Delivered',
-            paymentMethod: 'Credit Card (**** 4242)',
-            shippingAddress: '45 Uhuru Street, Dar es Salaam, Tanzania',
-            items: [
-              {
-                id: 'demo-4',
-                name: 'Apple MacBook Air M2 13-inch',
-                price: 320.0,
-                description: 'Supercharged by M2 chip, 8-core CPU, all-day battery life.',
-                category: 'Electronics',
-                image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=600&auto=format&fit=crop&q=80',
-                boughtAt: 'March 1, 2026',
-                orderId: 'ORD-89421',
-                quantity: 1,
-              },
-              {
-                id: 'demo-5',
-                name: 'Organic Roast Arabica Coffee Beans (1kg)',
-                price: 99.98,
-                description: 'Single-origin premium roasted coffee beans from Mount Kilimanjaro slopes.',
-                category: 'Groceries',
-                image: 'https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=600&auto=format&fit=crop&q=80',
-                boughtAt: 'March 1, 2026',
-                orderId: 'ORD-89421',
-                quantity: 2,
-              },
-            ],
-          },
-          {
-            id: 'ORD-76110',
-            date: 'February 18, 2026',
-            totalPrice: 159.0,
-            status: 'Delivered',
-            paymentMethod: 'Mobile Money (M-Pesa)',
-            shippingAddress: '12 Bagamoyo Rd, Dar es Salaam, Tanzania',
-            items: [
-              {
-                id: 'demo-6',
-                name: 'Handcrafted African Wax Print Tote Bag',
-                price: 159.0,
-                description: '100% genuine leather trim with vibrant authentic Kitenge fabric patterns.',
-                category: 'Clothing',
-                image: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=600&auto=format&fit=crop&q=80',
-                boughtAt: 'February 18, 2026',
-                orderId: 'ORD-76110',
-                quantity: 1,
-              },
-            ],
-          },
-        ];
-        setOrders(initialOrders);
-        localStorage.setItem('uzananunua_orders', JSON.stringify(initialOrders));
+        setCurrentUser(null);
+        setLikedProducts([]);
+        setCartItems([]);
+        setOrders([]);
       }
     } catch (e) {
       console.error('Error loading localStorage:', e);
@@ -271,6 +178,7 @@ export default function BuyerDashboard() {
 
   // Actions
   const toggleLike = (product: ProductItem) => {
+    if (!currentUser) return;
     if (isProductLiked(product.id)) {
       const updated = likedProducts.filter((p) => p.id !== product.id);
       saveLiked(updated);
@@ -283,6 +191,7 @@ export default function BuyerDashboard() {
   };
 
   const addToCart = (product: ProductItem) => {
+    if (!currentUser) return;
     const existingIndex = cartItems.findIndex((ci) => ci.product.id === product.id);
     let updated;
     if (existingIndex > -1) {
@@ -296,6 +205,7 @@ export default function BuyerDashboard() {
   };
 
   const updateCartQty = (productId: string, delta: number) => {
+    if (!currentUser) return;
     const updated = cartItems
       .map((item) => {
         if (item.product.id === productId) {
@@ -310,13 +220,14 @@ export default function BuyerDashboard() {
   };
 
   const removeFromCart = (productId: string) => {
+    if (!currentUser) return;
     const updated = cartItems.filter((item) => item.product.id !== productId);
     saveCart(updated);
     showToast('Item removed from cart');
   };
 
   const handleCheckout = () => {
-    if (cartItems.length === 0) return;
+    if (!currentUser || cartItems.length === 0) return;
 
     setIsCheckingOut(true);
     setTimeout(() => {

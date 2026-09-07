@@ -35,19 +35,21 @@ export default function ProductsPage() {
   const [authPrompt, setAuthPrompt] = useState<{
     isOpen: boolean;
     type: 'seller' | 'buyer';
-  }>({ isOpen: false, type: 'buyer' });
+    action?: 'dashboard' | 'buy' | 'like';
+    productName?: string;
+  }>({ isOpen: false, type: 'buyer', action: 'dashboard' });
 
   const handleSellerClick = (e: React.MouseEvent) => {
     if (!currentUser) {
       e.preventDefault();
-      setAuthPrompt({ isOpen: true, type: 'seller' });
+      setAuthPrompt({ isOpen: true, type: 'seller', action: 'dashboard' });
     }
   };
 
   const handleBuyerClick = (e: React.MouseEvent) => {
     if (!currentUser) {
       e.preventDefault();
-      setAuthPrompt({ isOpen: true, type: 'buyer' });
+      setAuthPrompt({ isOpen: true, type: 'buyer', action: 'dashboard' });
     }
   };
 
@@ -60,6 +62,9 @@ export default function ProductsPage() {
     try {
       localStorage.removeItem('uzananunua_user');
       setCurrentUser(null);
+      setLikedIds([]);
+      setCartCount(0);
+      setBoughtIds([]);
       router.push('/');
     } catch (e) {
       console.error(e);
@@ -72,32 +77,37 @@ export default function ProductsPage() {
       const savedUser = localStorage.getItem('uzananunua_user');
       if (savedUser) {
         setCurrentUser(JSON.parse(savedUser));
-      }
 
-      const savedOrders = localStorage.getItem('uzananunua_orders');
-      if (savedOrders) {
-        const parsed = JSON.parse(savedOrders);
-        const ids: string[] = [];
-        parsed.forEach((order: any) => {
-          order.items?.forEach((item: any) => {
-            if (item.id) ids.push(item.id);
-            if (item.name) ids.push(item.name.toLowerCase());
+        const savedOrders = localStorage.getItem('uzananunua_orders');
+        if (savedOrders) {
+          const parsed = JSON.parse(savedOrders);
+          const ids: string[] = [];
+          parsed.forEach((order: any) => {
+            order.items?.forEach((item: any) => {
+              if (item.id) ids.push(item.id);
+              if (item.name) ids.push(item.name.toLowerCase());
+            });
           });
-        });
-        setBoughtIds(ids);
-      }
+          setBoughtIds(ids);
+        }
 
-      const savedLiked = localStorage.getItem('uzananunua_liked');
-      if (savedLiked) {
-        const parsedLiked = JSON.parse(savedLiked);
-        setLikedIds(parsedLiked.map((item: any) => item.id));
-      }
+        const savedLiked = localStorage.getItem('uzananunua_liked');
+        if (savedLiked) {
+          const parsedLiked = JSON.parse(savedLiked);
+          setLikedIds(parsedLiked.map((item: any) => item.id));
+        }
 
-      const savedCart = localStorage.getItem('uzananunua_cart');
-      if (savedCart) {
-        const parsedCart = JSON.parse(savedCart);
-        const count = parsedCart.reduce((sum: number, c: any) => sum + (c.quantity || 1), 0);
-        setCartCount(count);
+        const savedCart = localStorage.getItem('uzananunua_cart');
+        if (savedCart) {
+          const parsedCart = JSON.parse(savedCart);
+          const count = parsedCart.reduce((sum: number, c: any) => sum + (c.quantity || 1), 0);
+          setCartCount(count);
+        }
+      } else {
+        setCurrentUser(null);
+        setLikedIds([]);
+        setCartCount(0);
+        setBoughtIds([]);
       }
     } catch (e) {
       console.error('Error reading localStorage in products page:', e);
@@ -143,6 +153,16 @@ export default function ProductsPage() {
   };
 
   const handleToggleLike = (product: Product) => {
+    if (!currentUser) {
+      setAuthPrompt({
+        isOpen: true,
+        type: 'buyer',
+        action: 'like',
+        productName: product.name,
+      });
+      return;
+    }
+
     try {
       const savedLiked = localStorage.getItem('uzananunua_liked');
       let currentLiked = savedLiked ? JSON.parse(savedLiked) : [];
@@ -172,6 +192,16 @@ export default function ProductsPage() {
   };
 
   const handleAddToCart = (product: Product) => {
+    if (!currentUser) {
+      setAuthPrompt({
+        isOpen: true,
+        type: 'buyer',
+        action: 'buy',
+        productName: product.name,
+      });
+      return;
+    }
+
     try {
       const savedCart = localStorage.getItem('uzananunua_cart');
       let currentCart = savedCart ? JSON.parse(savedCart) : [];
@@ -471,30 +501,60 @@ export default function ProductsPage() {
             {/* Icon */}
             <div
               className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-inner ${
-                authPrompt.type === 'seller'
+                authPrompt.action === 'like'
+                  ? 'bg-rose-50 text-rose-500 border border-rose-200'
+                  : authPrompt.type === 'seller'
                   ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
                   : 'bg-blue-50 text-blue-600 border border-blue-200'
               }`}
             >
-              {authPrompt.type === 'seller' ? '💼' : '🛍️'}
+              {authPrompt.action === 'like'
+                ? '❤️'
+                : authPrompt.action === 'buy'
+                ? '🛒'
+                : authPrompt.type === 'seller'
+                ? '💼'
+                : '🛍️'}
             </div>
 
             {/* Title & Badge */}
             <div>
               <span
                 className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 ${
-                  authPrompt.type === 'seller'
+                  authPrompt.action === 'like'
+                    ? 'bg-rose-50 text-rose-700 border border-rose-100'
+                    : authPrompt.action === 'buy'
+                    ? 'bg-blue-50 text-blue-700 border border-blue-100'
+                    : authPrompt.type === 'seller'
                     ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
                     : 'bg-blue-50 text-blue-700 border border-blue-100'
                 }`}
               >
-                {authPrompt.type === 'seller' ? 'Seller Portal Access' : 'Buyer Portal Access'}
+                {authPrompt.action === 'like'
+                  ? 'Sign In to Like / Save'
+                  : authPrompt.action === 'buy'
+                  ? 'Sign In to Buy'
+                  : authPrompt.type === 'seller'
+                  ? 'Seller Portal Access'
+                  : 'Buyer Dashboard Access'}
               </span>
               <h3 className="text-xl sm:text-2xl font-black text-slate-900">
-                Please Log In First
+                {authPrompt.action === 'like'
+                  ? 'Please Log In to Like Products'
+                  : authPrompt.action === 'buy'
+                  ? 'Please Log In to Buy Products'
+                  : 'Please Log In First'}
               </h3>
               <p className="mt-2 text-sm text-slate-600 leading-relaxed">
-                {authPrompt.type === 'seller'
+                {authPrompt.action === 'like'
+                  ? `You must log in or register before you can like "${
+                      authPrompt.productName || 'products'
+                    }" or save items to your wishlist.`
+                  : authPrompt.action === 'buy'
+                  ? `You must log in or register before you can add "${
+                      authPrompt.productName || 'products'
+                    }" to your cart or purchase products.`
+                  : authPrompt.type === 'seller'
                   ? 'To access the Seller Dashboard and list your products for sale, please log in or register with a Seller account.'
                   : 'To access the Buyer Dashboard and view your wishlist, orders, and cart, please log in or register with a Buyer account.'}
               </p>
@@ -503,18 +563,24 @@ export default function ProductsPage() {
             {/* Actions */}
             <div className="space-y-2.5 pt-2">
               <Link
-                href={`/login?redirect=${
-                  authPrompt.type === 'seller' ? '/sell' : '/buyer-dashboard'
-                }&message=Please log in to access your ${
-                  authPrompt.type === 'seller' ? 'Seller' : 'Buyer'
-                } Dashboard`}
+                href={
+                  authPrompt.action === 'like'
+                    ? '/login?redirect=/products&message=Please log in to like products and save items to your wishlist'
+                    : authPrompt.action === 'buy'
+                    ? '/login?redirect=/products&message=Please log in to add items to your cart and buy products'
+                    : authPrompt.type === 'seller'
+                    ? '/login?redirect=/sell&message=Please log in to access the Seller Dashboard'
+                    : '/login?redirect=/buyer-dashboard&message=Please log in to access your Buyer Dashboard'
+                }
                 className={`w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 ${
-                  authPrompt.type === 'seller'
+                  authPrompt.action === 'like'
+                    ? 'bg-rose-600 hover:bg-rose-700'
+                    : authPrompt.type === 'seller'
                     ? 'bg-emerald-600 hover:bg-emerald-700'
                     : 'bg-blue-600 hover:bg-blue-700'
                 }`}
               >
-                <span>Log In to Your Account</span>
+                <span>Log In to Continue</span>
                 <span>&rarr;</span>
               </Link>
               <Link
