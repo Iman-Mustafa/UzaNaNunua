@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 
 interface ProductItem {
@@ -35,6 +36,7 @@ interface UserSession {
 }
 
 export default function BuyerDashboard() {
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState<'liked' | 'cart' | 'orders'>('orders');
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [productsCatalog, setProductsCatalog] = useState<ProductItem[]>([]);
@@ -59,7 +61,7 @@ export default function BuyerDashboard() {
     try {
       localStorage.removeItem('uzananunua_user');
       setCurrentUser(null);
-      showToast('Logged out successfully');
+      router.push('/');
     } catch (e) {
       console.error(e);
     }

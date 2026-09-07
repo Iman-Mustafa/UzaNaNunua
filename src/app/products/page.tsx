@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import BackButton from '@/components/BackButton';
 
 interface Product {
@@ -22,6 +23,7 @@ interface UserSession {
 }
 
 export default function ProductsPage() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -40,7 +42,7 @@ export default function ProductsPage() {
     try {
       localStorage.removeItem('uzananunua_user');
       setCurrentUser(null);
-      showToast('Logged out successfully');
+      router.push('/');
     } catch (e) {
       console.error(e);
     }

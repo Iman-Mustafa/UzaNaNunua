@@ -45,7 +45,7 @@ export default function SellPage() {
     try {
       localStorage.removeItem('uzananunua_user');
       setCurrentUser(null);
-      router.push('/login');
+      router.push('/');
     } catch (e) {
       console.error(e);
     }
