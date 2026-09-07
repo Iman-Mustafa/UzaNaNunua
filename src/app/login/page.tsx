@@ -70,7 +70,7 @@ export default function LoginPage() {
           <div className="w-[72px]" />
         </div>
         <p className="mt-2 text-sm text-slate-600">
-          Enter your name and password to access your account
+          Enter your name or phone number and password to access your account
         </p>
       </div>
 
@@ -92,20 +92,21 @@ export default function LoginPage() {
           )}
 
           <form className="space-y-6" onSubmit={handleSubmit}>
-            {/* 1. Name Field */}
+            {/* 1. Name or Phone Field */}
             <div>
               <label htmlFor="name" className="block text-sm font-semibold text-slate-700">
-                Name
+                Name or Phone Number
               </label>
               <div className="mt-1">
                 <input
                   id="name"
                   name="name"
                   type="text"
+                  autoComplete="username"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Enter your name"
+                  placeholder="e.g. Anna Mastai or +255 712 345 678"
                   className="appearance-none block w-full px-3.5 py-2.5 border border-slate-300 rounded-xl shadow-xs placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm transition"
                 />
               </div>

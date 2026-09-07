@@ -49,10 +49,10 @@ export default function SignUpPage() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          name: formData.name,
-          phone: formData.phone,
-          role: formData.role,
-          password: formData.password,
+          name: formData.name.trim(),
+          phone: formData.phone.trim(),
+          role: formData.role.trim(),
+          password: formData.password.trim(),
         }),
       });
 

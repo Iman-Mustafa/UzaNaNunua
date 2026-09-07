@@ -9,32 +9,49 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    const { name, password } = body;
+    const identifier = String(body.name || body.phone || body.identifier || '').trim();
+    const password = String(body.password || '').trim();
 
-    if (!name || !password) {
+    if (!identifier || !password) {
       return NextResponse.json(
-        { message: 'Please provide both Name and Password.' },
+        { message: 'Please provide both Name/Phone Number and Password.' },
         { status: 400 }
       );
     }
 
-    const trimmedName = name.trim();
-    const trimmedPassword = password.trim();
+    // Safely escape special characters for regex (e.g. '+' in '+255...')
+    const escapeRegex = (str: string) => str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const escapedInput = escapeRegex(identifier);
 
-    // Find user by name (case-insensitive, trimmed)
-    const user = await User.findOne({
-      name: { $regex: new RegExp(`^${trimmedName}$`, 'i') },
-    });
+    // Extract digits to support phone matching across different formats (e.g., 0712... vs +255712...)
+    const digitsOnly = identifier.replace(/\D/g, '');
+
+    const orConditions: any[] = [
+      // Case-insensitive name match allowing optional whitespace
+      { name: { $regex: new RegExp(`^\\s*${escapedInput}\\s*$`, 'i') } },
+      // Direct phone match
+      { phone: identifier },
+      { phone: { $regex: new RegExp(`^\\s*${escapedInput}\\s*$`, 'i') } },
+    ];
+
+    // If identifier has at least 6 digits, match against last 9 digits (handles country code variants)
+    if (digitsOnly.length >= 6) {
+      const matchSuffix = digitsOnly.slice(-9);
+      orConditions.push({ phone: { $regex: new RegExp(escapeRegex(matchSuffix)) } });
+    }
+
+    const user = await User.findOne({ $or: orConditions });
 
     if (!user) {
       return NextResponse.json(
-        { message: 'No account found with that name. Please check your name or sign up.' },
+        { message: 'No account found with that name or phone number. Please check your details or sign up.' },
         { status: 401 }
       );
     }
 
     // Check password (plain text comparison, trimmed)
-    if (!user.password || user.password.trim() !== trimmedPassword) {
+    const userPass = String(user.password || '').trim();
+    if (!userPass || userPass !== password) {
       return NextResponse.json(
         { message: 'Incorrect password. Please try again.' },
         { status: 401 }

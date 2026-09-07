@@ -14,20 +14,24 @@ const UserSchema: Schema = new Schema(
     name: {
       type: String,
       required: [true, 'Please provide a name'],
+      trim: true,
     },
     phone: {
       type: String,
       required: [true, 'Please provide a phone number'],
+      trim: true,
     },
     role: {
       type: String,
       enum: ['Seller', 'Buyer'],
       default: 'Buyer',
       required: true,
+      trim: true,
     },
     password: {
       type: String,
       required: [true, 'Please provide a password'],
+      trim: true,
     },
   },
   {
