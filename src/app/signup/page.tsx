@@ -20,6 +20,19 @@ export default function SignUpPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const requestedRole = params.get('role');
+      if (requestedRole && (requestedRole.toLowerCase() === 'seller' || requestedRole.toLowerCase() === 'buyer')) {
+        setFormData((prev) => ({
+          ...prev,
+          role: requestedRole.toLowerCase() === 'seller' ? 'Seller' : 'Buyer',
+        }));
+      }
+    }
+  }, []);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));

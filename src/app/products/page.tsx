@@ -32,6 +32,24 @@ export default function ProductsPage() {
   const [cartCount, setCartCount] = useState<number>(0);
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [authPrompt, setAuthPrompt] = useState<{
+    isOpen: boolean;
+    type: 'seller' | 'buyer';
+  }>({ isOpen: false, type: 'buyer' });
+
+  const handleSellerClick = (e: React.MouseEvent) => {
+    if (!currentUser) {
+      e.preventDefault();
+      setAuthPrompt({ isOpen: true, type: 'seller' });
+    }
+  };
+
+  const handleBuyerClick = (e: React.MouseEvent) => {
+    if (!currentUser) {
+      e.preventDefault();
+      setAuthPrompt({ isOpen: true, type: 'buyer' });
+    }
+  };
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -213,6 +231,7 @@ export default function ProductsPage() {
               {String(currentUser?.role || '').toLowerCase() !== 'buyer' && (
                 <Link
                   href="/sell"
+                  onClick={handleSellerClick}
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 text-xs sm:text-sm font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl shadow-xs transition-all hover:scale-102"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -226,6 +245,7 @@ export default function ProductsPage() {
               {/* Direct Link to Buyer Dashboard */}
               <Link
                 href="/buyer-dashboard"
+                onClick={handleBuyerClick}
                 className="inline-flex items-center gap-2 px-3 py-2 text-xs sm:text-sm font-bold text-slate-700 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 rounded-xl border border-slate-200 transition-all shadow-xs"
               >
                 <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -343,6 +363,7 @@ export default function ProductsPage() {
             <div className="mt-4">
               <Link
                 href="/buyer-dashboard"
+                onClick={handleBuyerClick}
                 className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-blue-700 transition"
               >
                 Go to Buyer Dashboard
@@ -431,6 +452,88 @@ export default function ProductsPage() {
           </div>
         )}
       </main>
+
+      {/* Auth Prompt Modal for unauthenticated users */}
+      {authPrompt.isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full border border-slate-200 shadow-2xl space-y-5 text-center relative">
+            {/* Close Button */}
+            <button
+              onClick={() => setAuthPrompt({ ...authPrompt, isOpen: false })}
+              className="absolute top-4 right-4 p-2 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+              aria-label="Close"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            {/* Icon */}
+            <div
+              className={`w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-3xl shadow-inner ${
+                authPrompt.type === 'seller'
+                  ? 'bg-emerald-50 text-emerald-600 border border-emerald-200'
+                  : 'bg-blue-50 text-blue-600 border border-blue-200'
+              }`}
+            >
+              {authPrompt.type === 'seller' ? '💼' : '🛍️'}
+            </div>
+
+            {/* Title & Badge */}
+            <div>
+              <span
+                className={`inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider mb-2 ${
+                  authPrompt.type === 'seller'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                    : 'bg-blue-50 text-blue-700 border border-blue-100'
+                }`}
+              >
+                {authPrompt.type === 'seller' ? 'Seller Portal Access' : 'Buyer Portal Access'}
+              </span>
+              <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                Please Log In First
+              </h3>
+              <p className="mt-2 text-sm text-slate-600 leading-relaxed">
+                {authPrompt.type === 'seller'
+                  ? 'To access the Seller Dashboard and list your products for sale, please log in or register with a Seller account.'
+                  : 'To access the Buyer Dashboard and view your wishlist, orders, and cart, please log in or register with a Buyer account.'}
+              </p>
+            </div>
+
+            {/* Actions */}
+            <div className="space-y-2.5 pt-2">
+              <Link
+                href={`/login?redirect=${
+                  authPrompt.type === 'seller' ? '/sell' : '/buyer-dashboard'
+                }&message=Please log in to access your ${
+                  authPrompt.type === 'seller' ? 'Seller' : 'Buyer'
+                } Dashboard`}
+                className={`w-full py-3.5 px-4 rounded-xl text-white font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 ${
+                  authPrompt.type === 'seller'
+                    ? 'bg-emerald-600 hover:bg-emerald-700'
+                    : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                <span>Log In to Your Account</span>
+                <span>&rarr;</span>
+              </Link>
+              <Link
+                href={`/signup?role=${authPrompt.type === 'seller' ? 'Seller' : 'Buyer'}`}
+                className="w-full py-3 px-4 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition-all flex items-center justify-center"
+              >
+                Register as {authPrompt.type === 'seller' ? 'Seller' : 'Buyer'}
+              </Link>
+              <button
+                type="button"
+                onClick={() => setAuthPrompt({ ...authPrompt, isOpen: false })}
+                className="w-full py-2 text-xs font-semibold text-slate-400 hover:text-slate-600 transition-colors"
+              >
+                Cancel / Keep Browsing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

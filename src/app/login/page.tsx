@@ -13,6 +13,18 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [promptMessage, setPromptMessage] = useState('');
+  const [redirectPath, setRedirectPath] = useState('');
+
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const msg = params.get('message');
+      const redirect = params.get('redirect');
+      if (msg) setPromptMessage(msg);
+      if (redirect) setRedirectPath(redirect);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,17 +53,26 @@ export default function LoginPage() {
       }
 
       const isSeller = String(userObj?.role || '').trim().toLowerCase() === 'seller';
+      let targetUrl = isSeller ? '/sell' : '/buyer-dashboard';
+
+      if (redirectPath) {
+        // If buyer attempts to enter /sell, keep them safely on buyer dashboard
+        if (!isSeller && redirectPath === '/sell') {
+          targetUrl = '/buyer-dashboard';
+        } else {
+          targetUrl = redirectPath;
+        }
+      }
+
       if (isSeller) {
-        setSuccess(`Welcome back, ${userObj?.name || 'Seller'}! Opening Product Listing Page...`);
-        setTimeout(() => {
-          window.location.href = '/sell';
-        }, 800);
+        setSuccess(`Welcome back, ${userObj?.name || 'Seller'}! Opening Seller Dashboard...`);
       } else {
         setSuccess(`Welcome back, ${userObj?.name || 'User'}! Opening Buyer Dashboard...`);
-        setTimeout(() => {
-          window.location.href = '/buyer-dashboard';
-        }, 800);
       }
+
+      setTimeout(() => {
+        window.location.href = targetUrl;
+      }, 800);
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');
     } finally {
@@ -76,6 +97,13 @@ export default function LoginPage() {
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-6 shadow-xl border border-slate-200 rounded-3xl sm:px-10">
+          {promptMessage && !error && (
+            <div className="mb-4 bg-blue-50 border-l-4 border-blue-500 p-3.5 rounded-xl text-sm text-blue-900 font-medium flex items-center gap-2.5">
+              <span className="text-lg">🔐</span>
+              <span>{promptMessage}</span>
+            </div>
+          )}
+
           {error && (
             <div className="mb-4 bg-red-50 border-l-4 border-red-500 p-3.5 rounded-xl text-sm text-red-700 font-medium">
               {error}

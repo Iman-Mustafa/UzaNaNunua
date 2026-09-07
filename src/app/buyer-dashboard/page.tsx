@@ -388,6 +388,79 @@ export default function BuyerDashboard() {
     );
   }
 
+  // If not logged in, prompt user to login first
+  if (isLoaded && !currentUser) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800">
+        <header className="bg-white/95 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-20">
+              <div className="flex items-center space-x-2.5 sm:space-x-4">
+                <BackButton fallbackUrl="/products" label="Back" title="Back to Products" />
+                <Link href="/" className="flex items-center space-x-2 group">
+                  <span className="text-2xl font-black tracking-tight text-slate-900 group-hover:text-blue-600 transition-colors">
+                    Uza<span className="text-blue-600">NaNunua</span>
+                  </span>
+                </Link>
+                <span className="hidden sm:inline-block text-slate-300 text-xl font-light">|</span>
+                <span className="hidden sm:inline-block text-base font-bold text-slate-900">
+                  Buyer Dashboard
+                </span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Link
+                  href="/login?redirect=/buyer-dashboard&message=Please log in to access your Buyer Dashboard"
+                  className="px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 bg-white border border-slate-300 hover:bg-slate-50 rounded-xl transition-all shadow-xs"
+                >
+                  Log In
+                </Link>
+                <Link
+                  href="/signup?role=Buyer"
+                  className="px-4 py-2 text-xs sm:text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 rounded-xl transition-all shadow-xs"
+                >
+                  Register
+                </Link>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex-1 max-w-xl mx-auto w-full px-4 py-16 flex flex-col items-center justify-center text-center">
+          <div className="bg-white border border-slate-200 rounded-3xl p-8 sm:p-12 shadow-xl w-full">
+            <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 mx-auto flex items-center justify-center text-3xl mb-5 shadow-inner">
+              🛍️
+            </div>
+            <span className="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100 uppercase tracking-wider">
+              Buyer Dashboard Access
+            </span>
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-3 mb-3">
+              Please Log In First
+            </h1>
+            <p className="text-slate-600 text-sm sm:text-base leading-relaxed max-w-md mx-auto mb-8">
+              To access your personalized Buyer Dashboard, view your wishlist, shopping cart, and order history, please log in or register an account.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Link
+                href="/login?redirect=/buyer-dashboard&message=Please log in to access your Buyer Dashboard"
+                className="px-6 py-3.5 rounded-xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 shadow-md transition-all flex items-center justify-center gap-2"
+              >
+                <span>Log In to Buyer Account</span>
+                <span>&rarr;</span>
+              </Link>
+              <Link
+                href="/signup?role=Buyer"
+                className="px-6 py-3.5 rounded-xl bg-slate-100 text-slate-700 font-semibold text-sm hover:bg-slate-200 border border-slate-200 transition-all flex items-center justify-center"
+              >
+                Register as Buyer
+              </Link>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-800 selection:bg-blue-500 selection:text-white">
       {/* Toast Notification */}
