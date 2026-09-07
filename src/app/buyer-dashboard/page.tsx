@@ -662,7 +662,7 @@ export default function BuyerDashboard() {
                         <button
                           onClick={() => toggleLike(product)}
                           title="Remove from Liked"
-                          className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-md text-rose-500 hover:bg-rose-500 hover:text-white transition-all shadow-md"
+                          className="absolute top-3 right-3 p-2 rounded-full bg-rose-600 text-white hover:bg-rose-700 transition-all shadow-md ring-2 ring-rose-400"
                         >
                           <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
                             <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
@@ -1065,11 +1065,15 @@ export default function BuyerDashboard() {
                               </button>
                               <button
                                 onClick={() => toggleLike(item)}
-                                className="p-1.5 rounded-lg bg-slate-100 text-slate-600 hover:text-rose-600 hover:bg-rose-50 transition"
-                                title="Add to Liked"
+                                className={`p-1.5 rounded-lg transition ${
+                                  isProductLiked(item.id)
+                                    ? 'bg-rose-600 text-white hover:bg-rose-700 shadow-sm'
+                                    : 'bg-slate-100 text-slate-600 hover:text-rose-600 hover:bg-rose-50'
+                                }`}
+                                title={isProductLiked(item.id) ? 'Liked! Click to remove' : 'Add to Liked'}
                               >
                                 <svg
-                                  className={`w-4 h-4 ${isProductLiked(item.id) ? 'fill-rose-500 text-rose-500' : 'text-current'}`}
+                                  className={`w-4 h-4 ${isProductLiked(item.id) ? 'fill-white text-white' : 'text-current'}`}
                                   fill={isProductLiked(item.id) ? 'currentColor' : 'none'}
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"

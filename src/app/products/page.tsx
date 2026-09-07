@@ -94,7 +94,13 @@ export default function ProductsPage() {
         const savedLiked = localStorage.getItem('uzananunua_liked');
         if (savedLiked) {
           const parsedLiked = JSON.parse(savedLiked);
-          setLikedIds(parsedLiked.map((item: any) => item.id));
+          const ids: string[] = [];
+          parsedLiked.forEach((item: any) => {
+            if (item.id) ids.push(String(item.id));
+            if (item._id) ids.push(String(item._id));
+            if (item.name) ids.push(item.name.toLowerCase().trim());
+          });
+          setLikedIds(ids);
         }
 
         const savedCart = localStorage.getItem('uzananunua_cart');
@@ -149,7 +155,11 @@ export default function ProductsPage() {
   };
 
   const isLiked = (product: Product) => {
-    return likedIds.includes(product._id);
+    const prodId = String(product._id || (product as any).id || '');
+    const prodName = product.name ? product.name.toLowerCase().trim() : '';
+    return likedIds.some(
+      (id) => id === prodId || (prodName && id === prodName)
+    );
   };
 
   const handleToggleLike = (product: Product) => {
@@ -166,8 +176,12 @@ export default function ProductsPage() {
     try {
       const savedLiked = localStorage.getItem('uzananunua_liked');
       let currentLiked = savedLiked ? JSON.parse(savedLiked) : [];
+      const prodId = String(product._id || (product as any).id || '');
+      const prodName = product.name ? product.name.toLowerCase().trim() : '';
+
       const itemObj = {
-        id: product._id,
+        id: prodId,
+        _id: prodId,
         name: product.name,
         price: product.price,
         description: product.description,
@@ -177,12 +191,18 @@ export default function ProductsPage() {
       };
 
       if (isLiked(product)) {
-        currentLiked = currentLiked.filter((item: any) => item.id !== product._id);
-        setLikedIds(likedIds.filter((id) => id !== product._id));
+        currentLiked = currentLiked.filter((item: any) => {
+          const itemId = String(item.id || item._id || '');
+          const itemName = item.name ? item.name.toLowerCase().trim() : '';
+          return itemId !== prodId && itemName !== prodName;
+        });
+        setLikedIds((prev) =>
+          prev.filter((id) => id !== prodId && id !== prodName)
+        );
         showToast(`Removed "${product.name}" from Liked Products`);
       } else {
         currentLiked.push(itemObj);
-        setLikedIds([...likedIds, product._id]);
+        setLikedIds((prev) => [...prev, prodId, ...(prodName ? [prodName] : [])]);
         showToast(`Added "${product.name}" to Liked Products! ❤️`);
       }
       localStorage.setItem('uzananunua_liked', JSON.stringify(currentLiked));
@@ -424,16 +444,26 @@ export default function ProductsPage() {
 
                     {/* Like Button */}
                     <button
+                      id={`like-btn-${product._id}`}
                       onClick={() => handleToggleLike(product)}
-                      className={`absolute top-3 right-3 p-2 rounded-full backdrop-blur-md transition-all shadow-md ${
+                      className={`absolute top-3 right-3 p-2.5 rounded-full backdrop-blur-md transition-all duration-300 shadow-md ${
                         liked
-                          ? 'bg-rose-500 text-white'
-                          : 'bg-white/90 text-slate-600 hover:text-rose-500'
+                          ? 'bg-rose-600 text-white shadow-rose-500/40 ring-2 ring-rose-400 scale-105'
+                          : 'bg-white/90 text-slate-400 hover:text-rose-600 hover:bg-white border border-slate-200/80 shadow-sm'
                       }`}
-                      title={liked ? 'Unlike product' : 'Like product'}
+                      title={liked ? 'Liked! Click to unlike' : 'Like product'}
                     >
-                      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                        <path d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                      <svg
+                        className={`w-4 h-4 transition-transform duration-200 ${
+                          liked ? 'fill-white stroke-white scale-110' : 'fill-none stroke-current stroke-2'
+                        }`}
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                        />
                       </svg>
                     </button>
 
@@ -461,19 +491,47 @@ export default function ProductsPage() {
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs bg-blue-50 text-blue-700">
+                    <div className="mt-4 pt-3 border-t border-gray-100 flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full font-medium text-xs bg-blue-50 text-blue-700 truncate">
                         {product.category}
                       </span>
-                      <button
-                        onClick={() => handleAddToCart(product)}
-                        className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1"
-                      >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
-                        </svg>
-                        Add to Cart
-                      </button>
+                      <div className="flex items-center gap-1.5">
+                        {/* Interactive Like button on the product card */}
+                        <button
+                          id={`like-btn-action-${product._id}`}
+                          onClick={() => handleToggleLike(product)}
+                          className={`px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1 border shadow-xs ${
+                            liked
+                              ? 'bg-rose-600 text-white border-rose-600 hover:bg-rose-700 shadow-rose-500/20 ring-1 ring-rose-300'
+                              : 'bg-white text-slate-600 border-slate-200 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200'
+                          }`}
+                          title={liked ? 'Liked! Click to remove' : 'Like this product'}
+                        >
+                          <svg
+                            className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                              liked ? 'fill-white stroke-white scale-110' : 'fill-none stroke-current stroke-2'
+                            }`}
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                            />
+                          </svg>
+                          <span>{liked ? 'Liked' : 'Like'}</span>
+                        </button>
+
+                        <button
+                          onClick={() => handleAddToCart(product)}
+                          className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1 shrink-0"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
+                          </svg>
+                          Add to Cart
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
