@@ -702,7 +702,7 @@ export default function BuyerDashboard() {
 
                         <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
                           <span className="text-lg font-extrabold text-slate-900">
-                            ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
+                            TZS {typeof product.price === 'number' ? product.price.toLocaleString() : product.price}
                           </span>
                           <button
                             onClick={() => addToCart(product)}
@@ -825,7 +825,7 @@ export default function BuyerDashboard() {
                               {product.name}
                             </h3>
                             <p className="text-sm font-extrabold text-blue-600">
-                              ${product.price.toFixed(2)} each
+                              TZS {product.price.toLocaleString()} each
                             </p>
                           </div>
                         </div>
@@ -853,7 +853,7 @@ export default function BuyerDashboard() {
 
                           <div className="text-right">
                             <div className="text-base font-black text-slate-900">
-                              ${(product.price * quantity).toFixed(2)}
+                              TZS {(product.price * quantity).toLocaleString()}
                             </div>
                             <button
                               onClick={() => removeFromCart(product.id)}
@@ -877,7 +877,7 @@ export default function BuyerDashboard() {
                   <div className="space-y-3 text-sm">
                     <div className="flex justify-between text-slate-600">
                       <span>Subtotal ({cartItemCount} items)</span>
-                      <span className="font-semibold text-slate-800">${cartSubtotal.toFixed(2)}</span>
+                      <span className="font-semibold text-slate-800">TZS {cartSubtotal.toLocaleString()}</span>
                     </div>
                     <div className="flex justify-between text-slate-600">
                       <span>Standard Shipping</span>
@@ -885,11 +885,11 @@ export default function BuyerDashboard() {
                     </div>
                     <div className="flex justify-between text-slate-600">
                       <span>Estimated Taxes</span>
-                      <span className="font-semibold text-slate-800">$0.00</span>
+                      <span className="font-semibold text-slate-800">TZS 0</span>
                     </div>
                     <div className="pt-3 border-t border-slate-200 flex justify-between text-base font-extrabold text-slate-900">
                       <span>Total Amount</span>
-                      <span className="text-xl text-blue-600">${cartSubtotal.toFixed(2)}</span>
+                      <span className="text-xl text-blue-600">TZS {cartSubtotal.toLocaleString()}</span>
                     </div>
                   </div>
 
@@ -1017,7 +1017,7 @@ export default function BuyerDashboard() {
                             {order.status}
                           </span>
                           <span className="text-base font-extrabold text-slate-900">
-                            ${order.totalPrice.toFixed(2)}
+                            TZS {order.totalPrice.toLocaleString()}
                           </span>
                         </div>
                       </div>
@@ -1051,7 +1051,7 @@ export default function BuyerDashboard() {
                                   {item.name}
                                 </h4>
                                 <p className="text-xs text-slate-500">
-                                  Qty: {item.quantity || 1} &bull; ${item.price.toFixed(2)} each
+                                  Qty: {item.quantity || 1} &bull; TZS {item.price.toLocaleString()} each
                                 </p>
                               </div>
                             </div>
@@ -1204,7 +1204,7 @@ export default function BuyerDashboard() {
                           <div>
                             <span className="text-[10px] text-slate-400 uppercase font-semibold block">Paid</span>
                             <span className="text-base font-black text-slate-900">
-                              ${product.price.toFixed(2)}
+                              TZS {product.price.toLocaleString()}
                             </span>
                           </div>
 

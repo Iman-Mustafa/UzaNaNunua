@@ -453,7 +453,7 @@ export default function ProductsPage() {
                           {product.name}
                         </h3>
                         <p className="text-base font-bold text-blue-600 whitespace-nowrap">
-                          ${typeof product.price === 'number' ? product.price.toFixed(2) : product.price}
+                          TZS {typeof product.price === 'number' ? product.price.toLocaleString() : product.price}
                         </p>
                       </div>
                       <p className="mt-2 text-xs sm:text-sm text-gray-500 line-clamp-2 flex-1">

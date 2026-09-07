@@ -120,7 +120,7 @@ export default function SellPage() {
     }
 
     if (!formData.price || parseFloat(formData.price) <= 0) {
-      setError('Please enter a valid product price.');
+      setError('Please enter a valid product price in Tanzania Shillings (TZS).');
       setLoading(false);
       return;
     }
@@ -540,25 +540,26 @@ export default function SellPage() {
                     htmlFor="price"
                     className="block text-sm font-bold text-slate-800 mb-1.5"
                   >
-                    Price ($ USD) <span className="text-rose-500">*</span>
+                    Price (Tanzania Shillings - TZS) <span className="text-rose-500">*</span>
                   </label>
                   <div className="relative rounded-xl shadow-xs">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 font-bold text-sm">
-                      $
+                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500 font-bold text-xs sm:text-sm">
+                      TZS
                     </div>
                     <input
                       type="number"
                       name="price"
                       id="price"
                       required
-                      min="0.01"
-                      step="0.01"
+                      min="1"
+                      step="1"
                       value={formData.price}
                       onChange={handleChange}
-                      placeholder="0.00"
-                      className="appearance-none block w-full pl-8 pr-4 py-3 border border-slate-300 rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-semibold"
+                      placeholder="e.g. 50000"
+                      className="appearance-none block w-full pl-14 pr-4 py-3 border border-slate-300 rounded-xl text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all font-semibold"
                     />
                   </div>
+                  <p className="mt-1 text-xs text-slate-500">Amount in Tanzania Shillings (TSh / TZS)</p>
                 </div>
 
                 {/* Quantity Available */}
@@ -730,7 +731,7 @@ export default function SellPage() {
                         {formData.name || 'Product Title Placeholder'}
                       </h4>
                       <span className="text-sm font-extrabold text-blue-600 whitespace-nowrap">
-                        ${formData.price ? parseFloat(formData.price).toFixed(2) : '0.00'}
+                        TZS {formData.price ? Number(formData.price).toLocaleString() : '0'}
                       </span>
                     </div>
 
