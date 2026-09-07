@@ -22,6 +22,24 @@ interface UserSession {
   role: 'Seller' | 'Buyer';
 }
 
+interface CategoryOption {
+  id: string;
+  name: string;
+  icon: string;
+}
+
+const MARKETPLACE_CATEGORIES: CategoryOption[] = [
+  { id: 'All', name: 'All Categories', icon: '🏷️' },
+  { id: 'Electronics', name: 'Electronics', icon: '⚡' },
+  { id: 'Clothes', name: 'Clothes & Fashion', icon: '👕' },
+  { id: 'Shoes', name: 'Shoes & Footwear', icon: '👟' },
+  { id: 'Phones', name: 'Phones & Tablets', icon: '📱' },
+  { id: 'Wearables', name: 'Wearables & Watches', icon: '⌚' },
+  { id: 'Home & Living', name: 'Home & Living', icon: '🏡' },
+  { id: 'Sports & Fitness', name: 'Sports & Fitness', icon: '⚽' },
+  { id: 'Other', name: 'Other Essentials', icon: '📦' },
+];
+
 export default function ProductsPage() {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
@@ -32,12 +50,27 @@ export default function ProductsPage() {
   const [cartCount, setCartCount] = useState<number>(0);
   const [currentUser, setCurrentUser] = useState<UserSession | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [isCategoryDrawerOpen, setIsCategoryDrawerOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<string>('All');
   const [authPrompt, setAuthPrompt] = useState<{
     isOpen: boolean;
     type: 'seller' | 'buyer';
     action?: 'dashboard' | 'buy' | 'like';
     productName?: string;
   }>({ isOpen: false, type: 'buyer', action: 'dashboard' });
+
+  // Close drawer on Escape key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsCategoryDrawerOpen(false);
+      }
+    };
+    if (isCategoryDrawerOpen) {
+      window.addEventListener('keydown', handleKeyDown);
+    }
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isCategoryDrawerOpen]);
 
   const handleSellerClick = (e: React.MouseEvent) => {
     if (!currentUser) {
@@ -162,6 +195,30 @@ export default function ProductsPage() {
     );
   };
 
+  const isMatchingCategory = (prodCategory: string, filterCategory: string) => {
+    if (!filterCategory || filterCategory === 'All') return true;
+    const pCat = (prodCategory || '').toLowerCase().trim();
+    const fCat = filterCategory.toLowerCase().trim();
+    if (pCat === fCat) return true;
+    if (
+      (pCat === 'clothing' && fCat === 'clothes') ||
+      (pCat === 'clothes' && fCat === 'clothing')
+    ) {
+      return true;
+    }
+    return pCat.includes(fCat) || fCat.includes(pCat);
+  };
+
+  const getCategoryCount = (catId: string) => {
+    if (catId === 'All') return products.length;
+    return products.filter((p) => isMatchingCategory(p.category, catId)).length;
+  };
+
+  const displayedProducts =
+    selectedCategory === 'All'
+      ? products
+      : products.filter((p) => isMatchingCategory(p.category, selectedCategory));
+
   const handleToggleLike = (product: Product) => {
     if (!currentUser) {
       setAuthPrompt({
@@ -265,7 +322,23 @@ export default function ProductsPage() {
       <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-2 sm:space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              {/* Three Lines / Hamburger Icon to Open Category Drawer */}
+              <button
+                id="header-category-menu-btn"
+                type="button"
+                onClick={() => setIsCategoryDrawerOpen(true)}
+                className="p-2 sm:p-2.5 rounded-xl text-slate-700 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 border border-slate-200 hover:border-blue-200 transition-all flex items-center justify-center group focus:outline-none focus:ring-2 focus:ring-blue-500/40 cursor-pointer shadow-2xs"
+                title="Browse Categories"
+                aria-label="Open Categories Menu"
+              >
+                <div className="w-4 h-3.5 flex flex-col justify-between items-center">
+                  <span className="w-full h-0.5 bg-current rounded-full transition-transform group-hover:scale-x-110" />
+                  <span className="w-full h-0.5 bg-current rounded-full transition-transform" />
+                  <span className="w-full h-0.5 bg-current rounded-full transition-transform group-hover:scale-x-110" />
+                </div>
+              </button>
+
               <BackButton fallbackUrl="/" label="Back" title="Back to previous page" />
               <Link href="/" className="text-xl font-bold text-gray-900">
                 Uza<span className="text-blue-600">NaNunua</span>
@@ -374,13 +447,49 @@ export default function ProductsPage() {
           </div>
         )}
 
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-            Available Products
-          </h1>
-          <p className="mt-1 text-sm sm:text-base text-gray-600">
-            Browse items listed by sellers in our marketplace. Items you already bought are marked with a green sign.
-          </p>
+        <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Available Products
+              </h1>
+              {selectedCategory !== 'All' && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 shadow-2xs">
+                  <span>Category: {selectedCategory}</span>
+                  <button
+                    onClick={() => setSelectedCategory('All')}
+                    className="text-blue-500 hover:text-rose-600 font-black ml-1 text-sm leading-none"
+                    title="Clear category filter"
+                  >
+                    ×
+                  </button>
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-sm sm:text-base text-gray-600">
+              {selectedCategory === 'All'
+                ? 'Browse items listed by sellers in our marketplace. Items you already bought are marked with a green sign.'
+                : `Showing ${displayedProducts.length} product${displayedProducts.length === 1 ? '' : 's'} under "${selectedCategory}".`}
+            </p>
+          </div>
+
+          {/* Quick Categories Button */}
+          <button
+            id="category-filter-trigger-btn"
+            type="button"
+            onClick={() => setIsCategoryDrawerOpen(true)}
+            className="inline-flex items-center gap-2.5 px-4 py-2.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs sm:text-sm font-bold shadow-2xs transition-all self-start sm:self-auto hover:border-slate-400 cursor-pointer"
+          >
+            <div className="w-4 h-3 flex flex-col justify-between items-center">
+              <span className="w-full h-0.5 bg-slate-700 rounded-full" />
+              <span className="w-full h-0.5 bg-slate-700 rounded-full" />
+              <span className="w-full h-0.5 bg-slate-700 rounded-full" />
+            </div>
+            <span>Category: {selectedCategory === 'All' ? 'All Categories' : selectedCategory}</span>
+            <span className="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 text-xs font-bold">
+              {displayedProducts.length}
+            </span>
+          </button>
         </div>
 
         {loading ? (
@@ -420,9 +529,35 @@ export default function ProductsPage() {
               </Link>
             </div>
           </div>
+        ) : displayedProducts.length === 0 ? (
+          <div className="text-center py-16 bg-white shadow-sm rounded-2xl border border-gray-200 max-w-lg mx-auto p-8">
+            <div className="w-16 h-16 rounded-2xl bg-blue-50 text-blue-600 text-3xl mx-auto flex items-center justify-center mb-4 border border-blue-100 shadow-inner">
+              🏷️
+            </div>
+            <p className="text-xl font-bold text-gray-800">No products in this category</p>
+            <p className="text-sm text-gray-500 mt-1">
+              There are currently no products uploaded under &quot;<strong>{selectedCategory}</strong>&quot;.
+            </p>
+            <div className="mt-6 flex flex-col sm:flex-row gap-2.5 justify-center">
+              <button
+                type="button"
+                onClick={() => setSelectedCategory('All')}
+                className="inline-flex items-center justify-center px-4 py-2.5 bg-blue-600 text-white text-sm font-semibold rounded-xl hover:bg-blue-700 transition shadow-xs cursor-pointer"
+              >
+                Browse All Products
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsCategoryDrawerOpen(true)}
+                className="inline-flex items-center justify-center px-4 py-2.5 bg-slate-100 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-200 transition cursor-pointer"
+              >
+                Choose Another Category
+              </button>
+            </div>
+          </div>
         ) : (
           <div className="grid grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {products.map((product) => {
+            {displayedProducts.map((product) => {
               const bought = isBought(product);
               const liked = isLiked(product);
               return (
@@ -658,6 +793,112 @@ export default function ProductsPage() {
           </div>
         </div>
       )}
+      {/* Off-canvas Category Drawer (pulls rightward from the left edge) */}
+      <div
+        className={`fixed inset-0 z-50 transition-all duration-300 ${
+          isCategoryDrawerOpen ? 'visible pointer-events-auto' : 'invisible pointer-events-none'
+        }`}
+        aria-hidden={!isCategoryDrawerOpen}
+      >
+        {/* Backdrop Overlay */}
+        <div
+          className={`fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300 ${
+            isCategoryDrawerOpen ? 'opacity-100' : 'opacity-0'
+          }`}
+          onClick={() => setIsCategoryDrawerOpen(false)}
+        />
+
+        {/* Drawer Panel: pulled rightward from the left side */}
+        <div
+          className={`fixed inset-y-0 left-0 max-w-sm w-full bg-white shadow-2xl z-50 flex flex-col transition-transform duration-300 ease-out transform ${
+            isCategoryDrawerOpen ? 'translate-x-0' : '-translate-x-full'
+          }`}
+        >
+          {/* Drawer Header */}
+          <div className="p-5 border-b border-slate-200 flex items-center justify-between bg-slate-50/90">
+            <div className="flex items-center space-x-2.5">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-sm">
+                🏷️
+              </div>
+              <div>
+                <h2 className="text-lg font-extrabold text-slate-900 tracking-tight">Product Categories</h2>
+                <p className="text-xs text-slate-500">Filter marketplace products</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsCategoryDrawerOpen(false)}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 transition-colors cursor-pointer"
+              title="Close Menu"
+              aria-label="Close Categories Menu"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Quick Active Filter Indicator */}
+          {selectedCategory !== 'All' && (
+            <div className="px-5 py-3 bg-blue-50/80 border-b border-blue-100 flex items-center justify-between">
+              <div className="text-xs text-blue-800">
+                Active Filter: <strong className="font-bold">{selectedCategory}</strong>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedCategory('All');
+                  setIsCategoryDrawerOpen(false);
+                }}
+                className="text-xs text-blue-600 hover:text-blue-800 font-bold hover:underline cursor-pointer"
+              >
+                Reset Filter
+              </button>
+            </div>
+          )}
+
+          {/* Categories List */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-1.5">
+            {MARKETPLACE_CATEGORIES.map((cat) => {
+              const isSelected = selectedCategory === cat.id;
+              const count = getCategoryCount(cat.id);
+              return (
+                <button
+                  key={cat.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    setIsCategoryDrawerOpen(false);
+                  }}
+                  className={`w-full flex items-center justify-between px-4 py-3 rounded-2xl text-left transition-all duration-200 group cursor-pointer ${
+                    isSelected
+                      ? 'bg-blue-600 text-white shadow-md font-bold ring-2 ring-blue-400/50'
+                      : 'hover:bg-slate-100 text-slate-700 font-medium'
+                  }`}
+                >
+                  <div className="flex items-center space-x-3">
+                    <span className="text-xl flex-shrink-0">{cat.icon}</span>
+                    <span className="text-sm">{cat.name}</span>
+                  </div>
+                  <span
+                    className={`text-xs px-2.5 py-0.5 rounded-full font-bold transition-colors ${
+                      isSelected
+                        ? 'bg-white/20 text-white'
+                        : 'bg-slate-100 text-slate-600 group-hover:bg-slate-200'
+                    }`}
+                  >
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Drawer Footer */}
+          <div className="p-4 border-t border-slate-100 bg-slate-50 text-center text-xs text-slate-500">
+            Click any category to filter available products instantly
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
